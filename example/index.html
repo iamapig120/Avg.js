@@ -134,7 +134,7 @@
             });
         });
         avg.run(function () {
-            console.log("First Time runFunction");
+            avg.run(() => { console.log("First Time runFunction"); });
             avg.run(() => {
                 avg.loadImage({
                     layer: 15,
@@ -159,7 +159,7 @@
                     requestAnimationFrame(raf);
                 });
             });
-            console.log("No Output");
+            avg.run(() => { console.log("No Output"); });
         });
         avg.wait(1000);
         avg.run(() => {

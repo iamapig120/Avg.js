@@ -58,35 +58,34 @@
         }
     }
     //事件队列
-    function EventQueue() {
-        let queue = [];
-        //let length = 0;
-        //let pointer = 0;
-        this.add = function(f) {
-            queue.push(function() {
+    class EventQueue {
+        constructor() {
+            this._queue = new Array();
+            this.next();
+        }
+        add(f) {
+            this._queue.push(function() {
                 return new Promise(resolve => {
                     f(resolve);
                 });
             });
-            //length++;
-            //next();
-        };
-        function hasNext() {
-            return queue.length > 0;
         }
-        function next() {
-            let raf = requestAnimationFrame(async function autoRun() {
-                while (hasNext()) {
-                    //console.log(pointer + "length");
-                    await queue[0]();
-                    //queue[pointer] = null;
-                    queue.splice(0, 1);
-                    //pointer++;
+        hasNext() {
+            return this._queue.length > 0;
+        }
+        next() {
+            const _this = this;
+            this._raf = requestAnimationFrame(async function autoRun() {
+                while (_this.hasNext()) {
+                    await _this._queue[0]();
+                    _this._queue.splice(0, 1);
                 }
-                raf = requestAnimationFrame(autoRun);
+                _this.raf = requestAnimationFrame(autoRun);
             });
         }
-        next();
+        stopQueue() {
+            cancelAnimationFrame(this._raf);
+        }
     }
     let eQ;
     //图层对象
@@ -622,23 +621,29 @@
         let resFlag = true;
         const EQ_BACKUP = eQ;
         eQ = new EventQueue();
+        var error;
         try {
             f();
         } catch (e) {
+            console.log("catch Error");
+            error = e;
             if (e.info && e.info === "BREAK_BY_AVG") {
                 e.plies--;
                 if (e.plies <= 0) {
                     resFlag = true;
-                    console.log("runFunction Broke;");
+                    console.log("runFunction Broke");
                 }
             } else {
                 console.log(e);
                 console.log("runFunction runError");
             }
         } finally {
+            //eQ.stopQueue();
             eQ = EQ_BACKUP;
             if (resFlag) {
                 resolve();
+            } else if (error) {
+                throw error;
             }
         }
     }

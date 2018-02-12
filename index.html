@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>DEMO - 手柄的玄学实验室</title>
+    <script src="avg.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+    />
+    <style>
+        * {
+            border: 0;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        //let imgObj = avg.loadImgObjFromSrc("image/gifExample.gif");
+        randomArr = ["罗马不是一天建成的", "聚沙成塔，积少成多", "怕什么？反正隔壁某引擎09年开始做的", "这么咸鱼的手柄又在痴心妄想", "可喜可贺，可喜可贺", "毕业前一定要完成啊！"];
+        avg.creaveWindow({
+            width: 1280,
+            height: 720,
+            //backgroundColor: "#1099bb",
+            defaultFont: "20px Arial,'Microsoft Yahei'"
+            //volumeBGM : 0.7,
+            //volumeSE : 0.7,
+            //volumeVoice : 0.7,
+            //defaultFontColor: "#AAA"
+            //refresh: 100 //刷新频率（毫秒）
+        });
+        avg.wait(2000);
+        avg.playBGM({
+            src: "audio/Cycles.mp3"
+            //默认 volume:1
+        });
+        avg.loadImage({ layer: 1, src: "image/background/logo.png", alpha: 0 });
+        avg.loadText({
+            layer: 9,
+            text: "——" + randomArr[parseInt(Math.random() * randomArr.length)],
+            font: "italic 20px Arial,'Microsoft Yahei'",
+            color: "#020202",
+            x: 24,
+            y: 690,
+            alpha: 0
+        });
+        avg.move({ layer: 9, alpha: 1 }, 1000);
+        avg.move({ layer: 1, alpha: 1 }, 1000);
+        avg.wait(3500);
+        avg.move({ layer: 9, alpha: 0 }, 1000);
+        avg.move({ layer: 1, alpha: 0 }, 1000);
+        //avg.wait(500);
+        avg.waitByFrame(60);
+        avg.playBGM({
+            src: "audio/testBGM.mp3"
+            //默认 volume:1
+        });
+        avg.loadImage({ layer: 1, src: "image/background/bg1.jpg", x: 0, y: -40, alpha: 0 });
+        avg.move({ layer: 1, alpha: 1 }, 1000);
+        avg.wait(500);
+        avg.loadText({
+            layer: 10,
+            text: "不成熟的停放中页面",
+            font: "italic 36px Arial,'Microsoft Yahei'",
+            color: "#cee5f5",
+            x: 820,
+            y: 568,
+            alpha: 0
+        });
+        avg.move({ layer: 10, x: 844, alpha: 1 }, 1000);
+        avg.loadText({
+            layer: 11,
+            text: "代表着一个美好的愿景",
+            font: "italic 36px Arial,'Microsoft Yahei'",
+            color: "#cee5f5",
+            x: 850,
+            y: 614,
+            alpha: 0
+        });
+        avg.wait(500);
+        avg.move({ layer: 11, x: 874, alpha: 1 }, 1000);
+        avg.loadText({
+            layer: 12,
+            text: "图片作者 geralt ，来自 pixabay",
+            font: "12px Arial,'Microsoft Yahei'",
+            color: "#cee5f5",
+            x: 1056,
+            y: 692,
+            alpha: 0
+        });
+        avg.loadText({
+            layer: 13,
+            text: "音乐来自 musmus-musmus.main.jp",
+            font: "12px Arial,'Microsoft Yahei'",
+            color: "#cee5f5",
+            x: 1056,
+            y: 708,
+            alpha: 0
+        });
+        avg.wait(500);
+        avg.move({ layer: 12, x: 1080, alpha: 0.5 }, 500);
+        avg.wait(250);
+        avg.move({ layer: 13, x: 1080, alpha: 0.5 }, 500);
+        avg.wait(500);
+
+        /**
+         * @type {HTMLElement}
+         */
+        const dom = avg.getDOM();
+        let mouseX = 0, mouseY = 0;
+        function mouseMoveFun(e) {
+            //mouseX = e.clientX - dom.getBoundingClientRect().left;
+            //mouseY = e.clientY - dom.getBoundingClientRect().top;
+            mouseX = avg.mouse.x;
+            mouseY = avg.mouse.y;
+            avg.loadText({
+                layer: 16,
+                text: `${mouseX}px,${mouseY}px`,
+                font: "12px Arial,'Microsoft Yahei'",
+                color: "#cee5f5",
+                x: 20,
+                y: 22,
+                alpha: 1
+            });
+        }
+        //dom.addEventListener("mouseover",mouseMoveFun);
+        dom.addEventListener("mousemove", mouseMoveFun);
+        dom.addEventListener("click", e => {
+            avg.playSE({
+                src: "audio/game_over.mp3"
+                //默认 volume:1
+            });
+        });
+        avg.runFunction(function () {
+            let speed = 0;
+            let speedX = 50;
+            let yPos = 0;
+            let xPos = 0;
+            speed = 6;
+            speedX = 6;
+            avg.loadImage({
+                layer: 15,
+                src: "image/gifExample.png",
+                x: xPos,
+                y: yPos,
+                width: 100,
+                height: 100
+            });
+            requestAnimationFrame(function raf(t) {
+                //speed += 3;
+                //speedX *= 0.99;
+                yPos += speed;
+                xPos += speedX;
+                if (xPos > 1180) {
+                    xPos = 1180;
+                    speedX *= -1;
+                }
+                if (xPos < 0) {
+                    xPos = 0;
+                    speedX *= -1;
+                }
+                if (yPos >= 620) {
+                    yPos = 620;
+                    speed *= -1;
+                }
+                if (yPos < 0) {
+                    yPos = 0;
+                    speed *= -1;
+                }
+                avg.move({
+                    layer: 15,
+                    x: xPos,
+                    y: yPos
+                }, 0);
+                avg.waitByFrame(1);
+                if (!(speed < 1 && speed > -1 && yPos > 619 && Math.abs(speedX) < 0.0001)) {
+                    requestAnimationFrame(raf);
+                }
+            });
+            requestAnimationFrame(function raf(t) {
+                avg.loadText({
+                    layer: 16,
+                    text: `${mouseX}px,${mouseY}px`,
+                    font: "12px Arial,'Microsoft Yahei'",
+                    color: "#cee5f5",
+                    x: 20,
+                    y: 22,
+                    alpha: 1
+                });
+                requestAnimationFrame(raf);
+            });
+        });
+
+        avg.runFunction(function () {
+            console.log("runSuccess");
+        });
+
+        // avg.wait(500);
+        // avg.loadImage({
+        //     layer: 2,
+        //     src: "image/01.JPG",
+        //     alpha: 0.5,
+        // });
+        // avg.move({
+        //     layer: 2,
+        //     x: Math.random() * 1000 - 200,
+        //     y: Math.random() * 300 - 100,
+        //     width: 400,
+        //     height: 340,
+        //     alpha: 1
+        // }, 2000);
+        // avg.loadImage({
+        //     layer: 3,
+        //     src: "image/01.JPG",
+        //     x: 480,
+        //     y: 270,
+        //     width: 480,
+        //     height: 270,
+        //     alpha: 0.5
+        // });
+        // avg.loadText({
+        //     layer:10,
+        //     text:"Hello Canvas!",
+        //     x:50,
+        //     y:50,
+        //     rotate:30
+        // });
+        // avg.wait(1000);
+        // avg.loadImage({
+        //     layer: 4,
+        //     src: "image/01.JPG",
+        //     x: 240, y: 135,
+        //     width: 240,
+        //     height: 135,
+        //     alpha: 0.3
+        // });
+        // avg.removeLayer(3);
+        // avg.loadImage({
+        //     layer: 3,
+        //     src: "image/gifExample.png",
+        //     //img: imgObj,
+        //     x: 640,
+        //     y: 135,
+        //     width: 60,
+        //     height: 60,
+        //     alpha: 1,
+        //     rotate: 945,
+        //     rotatePointX: 360,
+        //     rotatePointY: 255
+        // });
+        // //setTimeout(function () {
+        // avg.move({
+        //     layer: 3,
+        //     x: 240,
+        //     y: 135,
+        //     width: 240,
+        //     height: 240,
+        //     alpha: 0.5,
+        //     rotate: 45
+        // }, 1500);
+        // //}, 1);
+        // avg.wait(1000);
+        // avg.setColor(10,"#FFF");
+        // avg.move({
+        //     layer: 10,
+        //     x: 60,
+        //     y: 640,
+        //     rotate: 0
+        // }, 2000);
+    </script>
+</body>

@@ -736,16 +736,17 @@
     avgJs["getDOM"] = function() {
         return canvasMain;
     };
-    avgJs["mouse"] = {};
-    avgJs["mouse"].x = new function() {
-        this.toString = function() {
-            return mouseX;
-        };
-    }();
-    avgJs["mouse"].y = new function() {
-        this.toString = function() {
-            return mouseY;
-        };
-    }();
+    avgJs["mouse"] = {
+        x: new function() {
+            this.toString = function() {
+                return mouseX;
+            };
+        }(),
+        y: new function() {
+            this.toString = function() {
+                return mouseY;
+            };
+        }()
+    };
     //avgJs["loadImgObjFromSrc"] = loadImgObjFromSrc;
 })(window);

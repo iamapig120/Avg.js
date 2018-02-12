@@ -619,16 +619,29 @@
     }
     //执行事件
     function runFunction(f, resolve) {
+        let resFlag = true;
         try {
             f();
         } catch (e) {
-            console.log(e);
-            console.log("runFunction runError");
+            if (e.info && e.info === "BREAK_BY_AVG") {
+                e.plies--;
+                if (e.plies <= 0) {
+                    resFlag = true;
+                    console.log("runFunction Broke;");
+                }
+            } else {
+                console.log(e);
+                console.log("runFunction runError");
+            }
         } finally {
-            resolve();
+            if (resFlag) {
+                resolve();
+            }
         }
     }
-
+    function breakFunction(plies = 1) {
+        throw { plies: plies, info: "BREAK_BY_AVG" };
+    }
     //坐标获取
     //入参 e.clientX , e.clientY
     // function getLocation() {
@@ -718,6 +731,9 @@
         eQ.add(function(resolve) {
             runFunction(f, resolve);
         });
+    };
+    avgJs["break"] = function(plies) {
+        breakFunction(plies);
     };
     avgJs["getLayerClientRect"] = function(index) {
         const re = theLayer[index];

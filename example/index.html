@@ -133,7 +133,28 @@
                 //默认 volume:1
             });
         });
-        avg.runFunction(function () {
+        avg.run(function () {
+            console.log("First Time runFunction");
+            avg.run(() => {
+                avg.break(2);
+                console.log("No Output");
+                requestAnimationFrame(function raf(t) {
+                    avg.loadText({
+                        layer: 16,
+                        text: `${mouseX}px,${mouseY}px`,
+                        font: "12px Arial,'Microsoft Yahei'",
+                        color: "#cee5f5",
+                        x: 20,
+                        y: 22,
+                        alpha: 1
+                    });
+                    requestAnimationFrame(raf);
+                });
+            });
+        });
+        avg.wait(1000);
+        avg.run(() => {
+            console.log("runSuccess1");
             let speed = 0;
             let speedX = 50;
             let yPos = 0;
@@ -192,9 +213,8 @@
                 requestAnimationFrame(raf);
             });
         });
-
-        avg.runFunction(function () {
-            console.log("runSuccess");
+        avg.run(function () {
+            console.log("runSuccess2");
         });
 
         // avg.wait(500);

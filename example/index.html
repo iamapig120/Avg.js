@@ -136,6 +136,14 @@
         avg.run(function () {
             console.log("First Time runFunction");
             avg.run(() => {
+                avg.loadImage({
+                    layer: 15,
+                    src: "image/gifExample.png",
+                    x: 0,
+                    y: 0,
+                    width: 100,
+                    height: 100
+                });
                 avg.break(2);
                 console.log("No Output");
                 requestAnimationFrame(function raf(t) {
@@ -151,6 +159,7 @@
                     requestAnimationFrame(raf);
                 });
             });
+            console.log("No Output");
         });
         avg.wait(1000);
         avg.run(() => {

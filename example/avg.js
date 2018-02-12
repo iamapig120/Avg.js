@@ -58,7 +58,7 @@
         }
     }
     //事件队列
-    function eventQueue() {
+    function EventQueue() {
         let queue = [];
         //let length = 0;
         //let pointer = 0;
@@ -330,7 +330,7 @@
         volumeVoice = p.volumeVoice != null ? p.volumeVoice : 0.7;
         windowWidth = p.width;
         windowHeight = p.height;
-        eQ = new eventQueue(); //创建一个事件队列对象
+        eQ = new EventQueue(); //创建一个事件队列对象
 
         let dom = canvasMain;
         let bbox; // = dom.getBoundingClientRect();
@@ -620,6 +620,8 @@
     //执行事件
     function runFunction(f, resolve) {
         let resFlag = true;
+        const EQ_BACKUP = eQ;
+        eQ = new EventQueue();
         try {
             f();
         } catch (e) {
@@ -634,6 +636,7 @@
                 console.log("runFunction runError");
             }
         } finally {
+            eQ = EQ_BACKUP;
             if (resFlag) {
                 resolve();
             }

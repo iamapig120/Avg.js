@@ -463,7 +463,7 @@
                     if (e.type == "image") {
                         paintBrush.globalAlpha = e.alpha;
                         if (e.rotate != 0) {
-                            //paintBrush.save();
+                            paintBrush.save();
                             let _rX = 0;
                             let _rY = 0;
                             if (
@@ -493,9 +493,9 @@
                                 e.width,
                                 e.height
                             );
-                            //paintBrush.restore();
-                            paintBrush.rotate(-rotateRate);
-                            paintBrush.translate(-_rX, -_rY);
+                            paintBrush.restore();
+                            //paintBrush.rotate(-rotateRate);
+                            //paintBrush.translate(-_rX, -_rY);
                             continue;
                         }
                         paintBrush.drawImage(
@@ -514,7 +514,7 @@
                         paintBrush.fillStyle = e.color;
                         paintBrush.font = e.font;
                         if (e.rotate != 0) {
-                            //paintBrush.save();
+                            paintBrush.save();
                             let _rX = 0;
                             let _rY = 0;
                             if (
@@ -534,9 +534,9 @@
                             let rotateRate = e.rotate * Math.PI / 180;
                             paintBrush.rotate(rotateRate);
                             paintBrush.fillText(e.text, e.x - _rX, e.y - _rY);
-                            //paintBrush.restore();
-                            paintBrush.rotate(-rotateRate);
-                            paintBrush.translate(-_rX, -_rY);
+                            paintBrush.restore();
+                            //paintBrush.rotate(-rotateRate);
+                            //paintBrush.translate(-_rX, -_rY);
                             continue;
                         }
                         paintBrush.fillText(e.text, e.x, e.y);

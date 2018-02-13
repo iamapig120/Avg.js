@@ -5,11 +5,23 @@
      * @type {HTMLCanvasElement}
      */
     let canvasMain; //主绘图板
+    /**
+     * @type {HTMLCanvasElement}
+     */
+    let canvasMask; //遮罩层绘图板
 
     let document = window.document,
         navigator = window.navigator,
         location = window.location;
+    /**
+     * @type {CanvasRenderingContext2D}
+     */
     let paintBrush; //2D画笔
+    /**
+     * @type {CanvasRenderingContext2D}
+     */
+    let paintBrushForMask; //遮罩层话必
+
     let theLayer = new Array(); //图层记录
     /**
      * @type {HTMLAudioElement}
@@ -105,7 +117,8 @@
             this.alpha,
             (this.type = "image");
         this.rotate, this.rotatePointX, this.rotatePointY;
-        let obj = this;
+        this.mask = p.mask ? true : false;
+        const obj = this;
         if (p.rotate != null) {
             //旋转相关
             this.rotate = p.rotate;
@@ -167,6 +180,7 @@
             this.rotatePointX = 0;
             this.rotatePointY = 0;
         }
+        this.mask = p.mask ? true : false;
         this.alpha = p.alpha == null ? 1 : p.alpha;
         resolve();
     }
@@ -305,30 +319,24 @@
         newCanvasObject.width = p.width;
         newCanvasObject.height = p.height;
         newCanvasObject.style.touchAction = "none";
-        // newCanvasObject.setAttribute(
-        //     "style",
-        //     "width:" + p.width + "px;height:" + p.height + "px;"
-        // );
-        //设置div的属性
-        //newCanvasObject.innerHTML = '';
-        //设置显示的数据，可以是标签
-        //newCanvasObject.style.width = width;
-        //newCanvasObject.style.height = height;
-        //设置css样式
+
         document.body.insertBefore(newCanvasObject, document.body.lastChild);
+
         canvasMain = newCanvasObject;
         paintBrush = newCanvasObject.getContext("2d");
-        //document.write(newCanvasObject);
-        //动态插入到body中
-        //refreshRate = p.refresh == null ? 10 : p.refresh;
-        //console.log(refreshRate);
-        //refreshSet = performance.now();
+
+        canvasMask = document.createElement("canvas");
+        canvasMask.width = p.width;
+        canvasMask.height = p.height;
+        paintBrushForMask = canvasMask.getContext("2d");
+
         //音量
         volumeBGM = p.volumeBGM != null ? p.volumeBGM : 0.7;
         volumeSE = p.volumeSE != null ? p.volumeSE : 0.7;
         volumeVoice = p.volumeVoice != null ? p.volumeVoice : 0.7;
         windowWidth = p.width;
         windowHeight = p.height;
+
         eQ = new EventQueue(); //创建一个事件队列对象
 
         let dom = canvasMain;
@@ -417,21 +425,24 @@
     }
     //依次重新绘制图层
     function drawImageLayer() {
-        let raf = requestAnimationFrame(function autoRun() {
-            //if (performance.now() - refreshSet >= refreshRate) { //老的基于setTimeout
-            if (true) {
-                //refreshSet = performance.now();
-                //console.log(imageLayer);
-                paintBrush.beginPath();
-                paintBrush.globalAlpha = 1;
-                paintBrush.fillStyle = backgroundColor;
-                paintBrush.fillRect(0, 0, windowWidth, windowHeight);
-                for (let i in theLayer) {
-                    let e = theLayer[i];
-                    //console.log(i);
-                    //console.log(e);
+        paintBrush.globalCompositeOperation = "destination-over";
+        paintBrushForMask.globalCompositeOperation = "source-in";
+        let paintBrushBackup;
+        let maskFlag;
+        requestAnimationFrame(function autoRun() {
+            paintBrush.beginPath();
+            paintBrush.clearRect(0, 0, windowWidth, windowHeight);
+            for (var i = theLayer.length - 1; i >= 0; i--) {
+                if (theLayer[i]) {
+                    const e = theLayer[i];
+                    //遮罩层逻辑
+                    if (e.mask && !maskFlag) {
+                        maskFlag = true;
+                        paintBrushBackup = paintBrush;
+                        paintBrush = paintBrushForMask;
+                    }
                     //图像绘制逻辑
-                    if (e && e.type == "image") {
+                    if (e.type == "image") {
                         paintBrush.globalAlpha = e.alpha;
                         if (e.rotate != 0) {
                             let _rX = 0;
@@ -442,7 +453,6 @@
                             ) {
                                 _rX = e.x;
                                 _rY = e.y;
-                                //console.log(_rX + "," + _rY);
                             } else if (
                                 e.rotatePointX != null ||
                                 e.rotatePointY != null
@@ -479,8 +489,7 @@
                             e.width,
                             e.height
                         );
-                        //paintBrush.drawImage(e.img, e.x, e.y);
-                    } else if (e && e.type == "text") {
+                    } else if (e.type == "text") {
                         paintBrush.globalAlpha = e.alpha;
                         paintBrush.fillStyle = e.color;
                         paintBrush.font = e.font;
@@ -493,7 +502,6 @@
                             ) {
                                 _rX = e.x;
                                 _rY = e.y;
-                                //console.log(_rX + "," + _rY);
                             } else if (
                                 e.rotatePointX != null ||
                                 e.rotatePointY != null
@@ -511,13 +519,20 @@
                         }
                         paintBrush.fillText(e.text, e.x, e.y);
                     }
+                    //遮罩层逻辑
+                    if (maskFlag &&!e.mask) {
+                        maskFlag = false;
+                        paintBrush = paintBrushBackup;
+                        paintBrush.drawImage(canvasMask,0,0);
+                        paintBrushForMask.clearRect(0, 0, windowWidth, windowHeight);
+                    }
                 }
-                paintBrush.closePath();
-                // a.forEach(function (e) {
-                //     paintBrush.drawImage(e.img, e.sx, e.sy, e.swidth, e.sheight, e.x, e.y, e.width, e.height)
-                // }, this);
             }
-            raf = requestAnimationFrame(autoRun);
+            paintBrush.globalAlpha = 1;
+            paintBrush.fillStyle = backgroundColor;
+            paintBrush.fillRect(0, 0, windowWidth, windowHeight);
+            paintBrush.closePath();
+            requestAnimationFrame(autoRun);
         });
     }
     //播放BGM
@@ -625,7 +640,7 @@
         try {
             f();
         } catch (e) {
-            console.log("catch Error");
+            //console.log("catch Error");
             error = e;
             if (e.info && e.info === "BREAK_BY_AVG") {
                 e.plies--;

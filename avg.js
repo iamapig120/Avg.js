@@ -117,7 +117,8 @@
             this.alpha,
             (this.type = "image");
         this.rotate, this.rotatePointX, this.rotatePointY;
-        this.mask = p.mask ? true : false;
+        //遮罩 "shade", 蒙版 "mask"
+        this.mask = p.mask ? p.mask : false;
         const obj = this;
         if (p.rotate != null) {
             //旋转相关
@@ -180,7 +181,8 @@
             this.rotatePointX = 0;
             this.rotatePointY = 0;
         }
-        this.mask = p.mask ? true : false;
+        //遮罩 "shade", 蒙版 "mask"
+        this.mask = p.mask ? p.mask : false;
         this.alpha = p.alpha == null ? 1 : p.alpha;
         resolve();
     }
@@ -426,9 +428,9 @@
     //依次重新绘制图层
     function drawImageLayer() {
         paintBrush.globalCompositeOperation = "destination-over";
-        paintBrushForMask.globalCompositeOperation = "source-in";
+        //paintBrushForMask.globalCompositeOperation = "source-in";
         let paintBrushBackup;
-        let maskFlag;
+        let maskFlag = false;
         requestAnimationFrame(function autoRun() {
             paintBrush.beginPath();
             paintBrush.clearRect(0, 0, windowWidth, windowHeight);
@@ -437,9 +439,25 @@
                     const e = theLayer[i];
                     //遮罩层逻辑
                     if (e.mask && !maskFlag) {
-                        maskFlag = true;
+                        maskFlag = e.mask;
+                        paintBrushForMask.globalCompositeOperation =
+                            "destination-over";
+                        // paintBrushForMask.globalAlpha = 1;
+                        // paintBrushForMask.fillStyle = backgroundColor;
+                        // paintBrushForMask.fillRect(
+                        //     0,
+                        //     0,
+                        //     windowWidth,
+                        //     windowHeight
+                        // );
                         paintBrushBackup = paintBrush;
                         paintBrush = paintBrushForMask;
+                    } else if (maskFlag == "shade") {
+                        paintBrushForMask.globalCompositeOperation =
+                            "source-in";
+                    } else if (maskFlag == "mask" && !e.mask) {
+                        paintBrushForMask.globalCompositeOperation =
+                            "destination-atop";
                     }
                     //图像绘制逻辑
                     if (e.type == "image") {
@@ -520,11 +538,16 @@
                         paintBrush.fillText(e.text, e.x, e.y);
                     }
                     //遮罩层逻辑
-                    if (maskFlag &&!e.mask) {
+                    if (maskFlag && !e.mask) {
                         maskFlag = false;
                         paintBrush = paintBrushBackup;
-                        paintBrush.drawImage(canvasMask,0,0);
-                        paintBrushForMask.clearRect(0, 0, windowWidth, windowHeight);
+                        paintBrush.drawImage(canvasMask, 0, 0);
+                        paintBrushForMask.clearRect(
+                            0,
+                            0,
+                            windowWidth,
+                            windowHeight
+                        );
                     }
                 }
             }

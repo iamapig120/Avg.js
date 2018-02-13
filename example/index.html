@@ -144,6 +144,7 @@
                     width: 100,
                     height: 100
                 });
+                //中断run 特性
                 avg.break(2);
                 console.log("No Output");
                 requestAnimationFrame(function raf(t) {
@@ -159,7 +160,6 @@
                     requestAnimationFrame(raf);
                 });
             });
-            avg.run(() => { console.log("No Output"); });
         });
         avg.wait(1000);
         avg.run(() => {
@@ -177,6 +177,40 @@
                 y: yPos,
                 width: 100,
                 height: 100
+            });
+            avg.loadImage({
+                layer: 17,
+                src: "image/gifExample.png",
+                x: 0,
+                y: 0,
+                width: 100,
+                height: 100
+            });
+            avg.loadImage({
+                layer: 18,
+                src: "image/gifExample.png",
+                x: 50,
+                y: 50,
+                width: 100,
+                height: 100,
+                mask: "shade"
+            });
+            avg.loadImage({
+                layer: 19,
+                src: "image/gifExample.png",
+                x: 0,
+                y: 100,
+                width: 100,
+                height: 100
+            });
+            avg.loadImage({
+                layer: 20,
+                src: "image/gifExample.png",
+                x: 50,
+                y: 150,
+                width: 100,
+                height: 100,
+                mask: "mask"
             });
             requestAnimationFrame(function raf(t) {
                 //speed += 3;

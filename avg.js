@@ -463,6 +463,7 @@
                     if (e.type == "image") {
                         paintBrush.globalAlpha = e.alpha;
                         if (e.rotate != 0) {
+                            //paintBrush.save();
                             let _rX = 0;
                             let _rY = 0;
                             if (
@@ -492,6 +493,7 @@
                                 e.width,
                                 e.height
                             );
+                            //paintBrush.restore();
                             paintBrush.rotate(-rotateRate);
                             paintBrush.translate(-_rX, -_rY);
                             continue;
@@ -512,6 +514,7 @@
                         paintBrush.fillStyle = e.color;
                         paintBrush.font = e.font;
                         if (e.rotate != 0) {
+                            //paintBrush.save();
                             let _rX = 0;
                             let _rY = 0;
                             if (
@@ -531,6 +534,7 @@
                             let rotateRate = e.rotate * Math.PI / 180;
                             paintBrush.rotate(rotateRate);
                             paintBrush.fillText(e.text, e.x - _rX, e.y - _rY);
+                            //paintBrush.restore();
                             paintBrush.rotate(-rotateRate);
                             paintBrush.translate(-_rX, -_rY);
                             continue;
@@ -656,9 +660,9 @@
     }
     //执行事件
     function runFunction(f, resolve) {
-        let resFlag = true;
-        const EQ_BACKUP = eQ;
-        eQ = new EventQueue();
+        var resFlag = true;
+        //const EQ_BACKUP = eQ;
+        //eQ = new EventQueue();
         var error;
         try {
             f();
@@ -676,8 +680,9 @@
                 console.log("runFunction runError");
             }
         } finally {
-            //eQ.stopQueue();
-            eQ = EQ_BACKUP;
+            //eQ.stopQueue(); //No Use
+
+            //eQ = EQ_BACKUP;
             if (resFlag) {
                 resolve();
             } else if (error) {

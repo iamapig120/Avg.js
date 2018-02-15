@@ -840,16 +840,12 @@
         return canvasMain;
     };
     avgJs.mouse = {
-        x: new function() {
-            this.toString = function() {
-                return mouseX;
-            };
-        }(),
-        y: new function() {
-            this.toString = function() {
-                return mouseY;
-            };
-        }()
+        get x() {
+            return mouseX;
+        },
+        get y() {
+            return mouseY;
+        }
     };
     //avgJs.loadImgObjFromSrc = loadImgObjFromSrc;
 })(window);

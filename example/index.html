@@ -243,18 +243,6 @@
                     requestAnimationFrame(raf);
                 }
             });
-            requestAnimationFrame(function raf(t) {
-                avg.loadText({
-                    layer: 16,
-                    text: `${mouseX}px,${mouseY}px`,
-                    font: "12px Arial,'Microsoft Yahei'",
-                    color: "#cee5f5",
-                    x: 20,
-                    y: 22,
-                    alpha: 1
-                });
-                requestAnimationFrame(raf);
-            });
         });
         avg.run(function () {
             console.log("runSuccess2");

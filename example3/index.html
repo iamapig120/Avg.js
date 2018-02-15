@@ -27,7 +27,7 @@
         //移动端兼容来自 https://www.jianshu.com/p/3fef68afd139
         //简书用户 小厨笔记
         //pc，移动事件兼容写法
-        var hastouch = "ontouchstart" in window ? true : false,
+        var hastouch = "ontouchstart" in window,
             tapstart = hastouch ? "touchstart" : "mousedown",
             tapmove = hastouch ? "touchmove" : "mousemove",
             tapend = hastouch ? "touchend" : "mouseup";

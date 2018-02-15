@@ -81,22 +81,27 @@
                     f(resolve);
                 });
             });
+            if (!this._flag) {
+                this.next();
+            }
         }
         hasNext() {
             return this._queue.length > 0;
         }
         next() {
             const _this = this;
-            this._raf = requestAnimationFrame(async function autoRun() {
+            this._flag = true;
+            (async function() {
                 while (_this.hasNext()) {
                     await _this._queue[0]();
                     _this._queue.splice(0, 1);
                 }
-                _this.raf = requestAnimationFrame(autoRun);
-            });
+                _this._flag = false;
+                //_this.raf = requestAnimationFrame(autoRun);
+            })();
         }
         stopQueue() {
-            cancelAnimationFrame(this._raf);
+            cancelAnimationFrame(this._flag);
         }
     }
     let eQ;

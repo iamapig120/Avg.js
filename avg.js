@@ -104,7 +104,38 @@
             cancelAnimationFrame(this._flag);
         }
     }
+    /**
+     * 所有事件队列
+     * @type {EventQueue}
+     */
     let eQ;
+    /**
+     * 所有事件队列
+     * @type {Array<EventQueue>}
+     */
+    const eQArray = new Array();
+    /**
+     * 事件队列当前下标
+     * @type {number}
+     */
+    let eQPointer = -1;
+
+    function nextEventQueue() {
+        eQPointer++;
+        if (!eQArray[eQPointer]) {
+            eQArray[eQPointer] = new EventQueue();
+        }
+        return eQArray[eQPointer];
+    }
+
+    function lastEventQueue() {
+        eQPointer--;
+        if (!eQArray[eQPointer]) {
+            eQArray[eQPointer] = new EventQueue();
+        }
+        return eQArray[eQPointer];
+    }
+
     //图层对象
     //图像图层
     function imgLayerObj(p, resolve) {
@@ -344,7 +375,7 @@
         windowWidth = p.width;
         windowHeight = p.height;
 
-        eQ = new EventQueue(); //创建一个事件队列对象
+        eQ = nextEventQueue(); //创建一个事件队列对象
 
         let dom = canvasMain;
         let bbox; // = dom.getBoundingClientRect();
@@ -665,9 +696,9 @@
     }
     //执行事件
     function runFunction(f, resolve) {
-        var resFlag = true;
+        var resFlag = false;
         //const EQ_BACKUP = eQ;
-        //eQ = new EventQueue();
+        //eQ = nextEventQueue();
         var error;
         try {
             f();
@@ -687,10 +718,10 @@
         } finally {
             //eQ.stopQueue(); //No Use
 
+            //eQ = lastEventQueue();
             //eQ = EQ_BACKUP;
-            if (resFlag) {
-                resolve();
-            } else if (error) {
+            resolve();
+            if (!resFlag && error) {
                 throw error;
             }
         }
@@ -716,82 +747,82 @@
     //    basetool = drawwindow;
     //    window.jsAvg = window.$ = jsAvg;
     //    window.jsAvg.basetool = drawwindow;
-    window["avg"] = {};
-    let avgJs = window["avg"];
-    avgJs["creaveWindow"] = creaveWindow;
+    window.avg = {};
+    let avgJs = window.avg;
+    avgJs.creaveWindow = creaveWindow;
 
-    avgJs["loadImage"] = function(p) {
+    avgJs.loadImage = function(p) {
         eQ.add(function(resolve) {
             loadImage(p, resolve);
         });
     };
-    avgJs["loadText"] = function(p) {
+    avgJs.loadText = function(p) {
         eQ.add(function(resolve) {
             loadText(p, resolve);
         });
     };
-    avgJs["playBGM"] = function(p) {
+    avgJs.playBGM = function(p) {
         eQ.add(function(resolve) {
             playBGM(p, resolve);
         });
     };
-    avgJs["stopBGM"] = function(p) {
+    avgJs.stopBGM = function(p) {
         eQ.add(function(resolve) {
             stopBGM(p, resolve);
         });
     };
-    avgJs["playSE"] = function(p) {
+    avgJs.playSE = function(p) {
         eQ.add(function(resolve) {
             playSE(p, resolve);
         });
     };
 
-    //avgJs["drawImageLayer"] = drawImageLayer;
-    avgJs["setLayer"] = function(p) {
+    //avgJs.drawImageLayer = drawImageLayer;
+    avgJs.setLayer = function(p) {
         eQ.add(function(resolve) {
             setLayer(p, resolve);
         });
     };
-    avgJs["removeLayer"] = function(p) {
+    avgJs.removeLayer = function(p) {
         eQ.add(function(resolve) {
             removeLayer(p, resolve);
         });
     };
-    avgJs["removeAllLayer"] = function() {
+    avgJs.removeAllLayer = function() {
         eQ.add(function(resolve) {
             removeAllLayer(resolve);
         });
     };
-    avgJs["move"] = function(p, t) {
+    avgJs.move = function(p, t) {
         eQ.add(function(resolve) {
             move(p, t, resolve);
         });
     };
-    avgJs["wait"] = function(t) {
+    avgJs.wait = function(t) {
         eQ.add(function(resolve) {
             wait(t, resolve);
         });
     };
-    avgJs["waitByFrame"] = function(f) {
+    avgJs.waitByFrame = function(f) {
         eQ.add(function(resolve) {
             waitByFrame(f, resolve);
         });
     };
-    avgJs["setColor"] = function(i, c) {
+    avgJs.setColor = function(i, c) {
         eQ.add(function(resolve) {
             theLayer[i].color = c;
             resolve();
         });
     };
-    avgJs["runFunction"] = function(f) {
+    avgJs.runFunction = function(f) {
         eQ.add(function(resolve) {
             runFunction(f, resolve);
         });
     };
-    avgJs["break"] = function(plies) {
+    avgJs.break = function(plies) {
         breakFunction(plies);
     };
-    avgJs["getLayerClientRect"] = function(index) {
+    avgJs.getLayerClientRect = function(index) {
         const re = theLayer[index];
         if (re) {
             return {
@@ -804,11 +835,11 @@
             return null;
         }
     };
-    avgJs["run"] = avgJs["runFunction"];
-    avgJs["getDOM"] = function() {
+    avgJs.run = avgJs.runFunction;
+    avgJs.getDOM = function() {
         return canvasMain;
     };
-    avgJs["mouse"] = {
+    avgJs.mouse = {
         x: new function() {
             this.toString = function() {
                 return mouseX;
@@ -820,5 +851,5 @@
             };
         }()
     };
-    //avgJs["loadImgObjFromSrc"] = loadImgObjFromSrc;
+    //avgJs.loadImgObjFromSrc = loadImgObjFromSrc;
 })(window);

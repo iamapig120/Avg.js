@@ -18,6 +18,7 @@
 
 <body>
     <script>
+        
         avg.creaveWindow({
             width: 480,
             height: 320,
@@ -33,6 +34,9 @@
 
         var canvasMask = document.createElement("canvas");
         var context2d = canvasMask.getContext("2d");
+
+        canvasMask.width = 480;
+        canvasMask.height = 320;
 
         context2d.lineCap = "round";
         context2d.lineJoin = "round";
@@ -63,12 +67,18 @@
 
         canvasMain.addEventListener(tapstart, e => {
             tapFlag = true;
-            pointerFromX = avg.mouse.x;
-            pointerFromY = avg.mouse.y;
+            pointerToX = avg.mouse.x;
+            pointerToY = avg.mouse.y;
         });
 
-        canvasMain.addEventListener(tapmove, e=>{
-
+        canvasMain.addEventListener(tapmove, e => {
+            if (tapFlag) {
+                pointerFromX = pointerToX;
+                pointerFromY = pointerToY;
+                pointerToX = avg.mouse.x;
+                pointerToY = avg.mouse.y;
+                drawLine({ pointerFromX, pointerFromY }, { pointerToX, pointerToY });
+            }
         });
 
         document.documentElement.addEventListener(tapend, e => {

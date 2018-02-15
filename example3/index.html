@@ -18,7 +18,7 @@
 
 <body>
     <script>
-        
+
         avg.creaveWindow({
             width: 480,
             height: 320,
@@ -47,9 +47,9 @@
         var pointerToX;
         var pointerToY;
 
-        var lineWeight = 48;
+        var lineWidthDef = 48;
 
-        function drawLine({ fromX = pointerFromX, fromY = pointerFromY }, { toX = pointerToX, toY = pointerToY }, lineWidth = 48) {
+        function drawLine(fromObj = { fromX = pointerFromX, fromY = pointerFromY }, toObj = { toX = pointerToX, toY = pointerToY }, lineWidth = lineWidthDef) {
             context2d.save();
             context2d.moveTo(fromX, fromY);
             context2d.lineTo(toX, toY);
@@ -77,7 +77,7 @@
                 pointerFromY = pointerToY;
                 pointerToX = avg.mouse.x;
                 pointerToY = avg.mouse.y;
-                drawLine({ pointerFromX, pointerFromY }, { pointerToX, pointerToY });
+                drawLine();
             }
         });
 

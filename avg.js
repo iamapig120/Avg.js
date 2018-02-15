@@ -69,7 +69,9 @@
             return null;
         }
     }
-    //事件队列
+    /**
+     * 事件队列
+     */
     class EventQueue {
         constructor() {
             this._queue = new Array();
@@ -97,11 +99,45 @@
                     _this._queue.splice(0, 1);
                 }
                 _this._flag = false;
-                //_this.raf = requestAnimationFrame(autoRun);
             })();
         }
-        stopQueue() {
-            cancelAnimationFrame(this._flag);
+        clearQueue() {
+            this._queue.splice(0, this._queue.length - 1);
+        }
+    }
+    /**
+     * 循环队列
+     */
+    class LoopQueue {
+        constructor() {
+            this._queue = new Array();
+            this.next();
+        }
+        add(f) {
+            this._queue.push(function() {
+                return new Promise(resolve => {
+                    f(resolve);
+                });
+            });
+            if (!this._flag) {
+                this.next();
+            }
+        }
+        next() {
+            const _this = this;
+            this._flag = true;
+            var pointer = 0;
+            (async function() {
+                while (true) {
+                    await _this._queue[pointer++]();
+                    if (pointer === _this._queue.length) {
+                        pointer = 0;
+                    }
+                }
+            })();
+        }
+        clearQueue() {
+            this._queue.splice(0, this._queue.length - 1);
         }
     }
     /**
@@ -111,7 +147,7 @@
     let eQ;
     /**
      * 所有事件队列
-     * @type {Array<EventQueue>}
+     * @type {Array<EventQueue|LoopQueue>}
      */
     const eQArray = new Array();
     /**
@@ -120,18 +156,27 @@
      */
     let eQPointer = -1;
 
-    function nextEventQueue() {
+    function nextEventQueue(type = "eventQueue") {
         eQPointer++;
         if (!eQArray[eQPointer]) {
-            eQArray[eQPointer] = new EventQueue();
+            switch (type) {
+                case "eventQueue": {
+                    eQArray[eQPointer] = new EventQueue();
+                    break;
+                }
+                case "loopQueue": {
+                    eQArray[eQPointer] = new LoopQueue();
+                    break;
+                }
+            }
         }
         return eQArray[eQPointer];
     }
 
     function lastEventQueue() {
         eQPointer--;
-        if (!eQArray[eQPointer]) {
-            eQArray[eQPointer] = new EventQueue();
+        if (eQPointer < 0) {
+            eQPointer = 0;
         }
         return eQArray[eQPointer];
     }
@@ -737,6 +782,37 @@
             }
         }
     }
+    //循环事件
+    function loopFunction(f, resolve) {
+        var resFlag = false;
+        //const EQ_BACKUP = eQ;
+        eQ = nextEventQueue("loopQueue");
+        var error;
+        try {
+            f();
+        } catch (e) {
+            //console.log("catch Error");
+            error = e;
+            if (e.info && e.info === "BREAK_BY_AVG") {
+                e.plies--;
+                if (e.plies <= 0) {
+                    resFlag = true;
+                    console.log("loopFunction Broke");
+                }
+                eQ.clearQueue();
+                eQ = lastEventQueue();
+                //eQ = EQ_BACKUP;
+                resolve();
+                if (!resFlag && error) {
+                    throw error;
+                }
+            } else {
+                console.log(e);
+                console.log("runFunction runError");
+            }
+            resolve();
+        }
+    }
     function breakFunction(plies = 1) {
         throw { plies: plies, info: "BREAK_BY_AVG" };
     }
@@ -830,6 +906,11 @@
             runFunction(f, resolve);
         });
     };
+    avgJs.loopFunction = function(f) {
+        eQ.add(function(resolve) {
+            loopFunction(f, resolve);
+        });
+    };
     avgJs.break = function(plies) {
         breakFunction(plies);
     };
@@ -847,6 +928,7 @@
         }
     };
     avgJs.run = avgJs.runFunction;
+    avgJs.loop = avgJs.runFunction;
     avgJs.getDOM = function() {
         return canvasMain;
     };

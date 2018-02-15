@@ -385,6 +385,17 @@
             mouseY = (e.clientY - bbox.top) * (p.height / bbox.height);
         }
         dom.addEventListener("mousemove", mouseMoveFun);
+        if ("ontouchstart" in window) {
+            function touchFun(e) {
+                e.preventDefault();
+                e = e.touches[0];
+                bbox = dom.getBoundingClientRect();
+                mouseX = (e.clientX - bbox.left) * (p.width / bbox.width);
+                mouseY = (e.clientY - bbox.top) * (p.height / bbox.height);
+            }
+            dom.addEventListener("touchmove", touchFun);
+            dom.addEventListener("touchstart", touchFun);
+        }
 
         drawImageLayer();
 

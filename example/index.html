@@ -109,7 +109,7 @@
          * @type {HTMLElement}
          */
         const dom = avg.getDOM();
-        // let mouseX = 0, mouseY = 0;
+        let mouseX = 0, mouseY = 0;
         // function mouseMoveFun(e) {
         //     //mouseX = e.clientX - dom.getBoundingClientRect().left;
         //     //mouseY = e.clientY - dom.getBoundingClientRect().top;
@@ -125,13 +125,13 @@
         //         alpha: 1
         //     });
         // }
-        //dom.addEventListener("mouseover",mouseMoveFun);
-        //dom.addEventListener("mousemove", mouseMoveFun);
+        // dom.addEventListener("mouseover",mouseMoveFun);
+        // dom.addEventListener("mousemove", mouseMoveFun);
         dom.addEventListener("click", e => {
-            //avg.playSE({
-            //    src: "audio/game_over.mp3"
+            avg.playSE({
+               src: "audio/game_over.mp3"
             //默认 volume:1
-            //});
+            });
         });
         avg.run(function () {
             avg.run(() => { console.log("First Time runFunction"); });

@@ -75,13 +75,10 @@
     class EventQueue {
         constructor() {
             this._queue = new Array();
-            this.next();
         }
         add(f) {
-            this._queue.push(function() {
-                return new Promise(resolve => {
-                    f(resolve);
-                });
+            this._queue.push(function(resolve) {
+                f(resolve);
             });
             if (!this._flag) {
                 this.next();
@@ -95,49 +92,57 @@
             this._flag = true;
             (async function() {
                 while (_this.hasNext()) {
-                    await _this._queue[0]();
+                    await (function() {
+                        return new Promise(r => {
+                            _this._queue[0](r);
+                        });
+                    })();
                     _this._queue.splice(0, 1);
                 }
                 _this._flag = false;
             })();
         }
         clearQueue() {
-            this._queue.splice(0, this._queue.length - 1);
+            this._queue.splice(0, this._queue.length);
         }
     }
     /**
      * 循环队列
      */
     class LoopQueue {
-        constructor() {
+        constructor(finishFun = () => {}) {
             this._queue = new Array();
-            this.next();
+            this._loopFun = finishFun;
         }
         add(f) {
-            this._queue.push(function() {
-                return new Promise(resolve => {
-                    f(resolve);
-                });
+            this._queue.push(function(resolve) {
+                f(resolve);
             });
             if (!this._flag) {
                 this.next();
             }
         }
+        hasNext() {
+            return this._queue.length > 0;
+        }
         next() {
             const _this = this;
             this._flag = true;
-            var pointer = 0;
             (async function() {
-                while (true) {
-                    await _this._queue[pointer++]();
-                    if (pointer === _this._queue.length) {
-                        pointer = 0;
-                    }
+                while (_this.hasNext()) {
+                    await (function() {
+                        return new Promise(r => {
+                            _this._queue[0](r);
+                        });
+                    })();
+                    _this._queue.splice(0, 1);
                 }
+                _this._flag = false;
+                _this._loopFun();
             })();
         }
         clearQueue() {
-            this._queue.splice(0, this._queue.length - 1);
+            this._queue.splice(0, this._queue.length);
         }
     }
     /**
@@ -156,7 +161,7 @@
      */
     let eQPointer = -1;
 
-    function nextEventQueue(type = "eventQueue") {
+    function nextEventQueue(type = "eventQueue", finishFun) {
         eQPointer++;
         if (!eQArray[eQPointer]) {
             switch (type) {
@@ -169,6 +174,12 @@
                     break;
                 }
             }
+        }
+        if (
+            finishFun &&
+            eQArray[eQPointer].__proto__.constructor === LoopQueue
+        ) {
+            eQArray[eQPointer]._loopFun = finishFun;
         }
         return eQArray[eQPointer];
     }
@@ -786,9 +797,9 @@
     function loopFunction(f, resolve) {
         var resFlag = false;
         //const EQ_BACKUP = eQ;
-        eQ = nextEventQueue("loopQueue");
         var error;
         try {
+            eQ = nextEventQueue("loopQueue", f);
             f();
         } catch (e) {
             //console.log("catch Error");
@@ -928,7 +939,7 @@
         }
     };
     avgJs.run = avgJs.runFunction;
-    avgJs.loop = avgJs.runFunction;
+    avgJs.loop = avgJs.loopFunction;
     avgJs.getDOM = function() {
         return canvasMain;
     };
@@ -940,5 +951,7 @@
             return mouseY;
         }
     };
+
+    window.theLayer = theLayer;
     //avgJs.loadImgObjFromSrc = loadImgObjFromSrc;
 })(window);

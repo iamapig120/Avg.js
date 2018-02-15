@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>DEMO - 手柄的玄学实验室</title>
-    <script src="../avg.min.js"></script>
+    <script src="../avg.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
     />
     <style>
@@ -109,29 +109,29 @@
          * @type {HTMLElement}
          */
         const dom = avg.getDOM();
-        let mouseX = 0, mouseY = 0;
-        function mouseMoveFun(e) {
-            //mouseX = e.clientX - dom.getBoundingClientRect().left;
-            //mouseY = e.clientY - dom.getBoundingClientRect().top;
-            mouseX = avg.mouse.x;
-            mouseY = avg.mouse.y;
-            avg.loadText({
-                layer: 16,
-                text: `${mouseX}px,${mouseY}px`,
-                font: "12px Arial,'Microsoft Yahei'",
-                color: "#cee5f5",
-                x: 20,
-                y: 22,
-                alpha: 1
-            });
-        }
+        // let mouseX = 0, mouseY = 0;
+        // function mouseMoveFun(e) {
+        //     //mouseX = e.clientX - dom.getBoundingClientRect().left;
+        //     //mouseY = e.clientY - dom.getBoundingClientRect().top;
+        //     mouseX = avg.mouse.x;
+        //     mouseY = avg.mouse.y;
+        //     avg.loadText({
+        //         layer: 16,
+        //         text: `${mouseX}px,${mouseY}px`,
+        //         font: "12px Arial,'Microsoft Yahei'",
+        //         color: "#cee5f5",
+        //         x: 20,
+        //         y: 22,
+        //         alpha: 1
+        //     });
+        // }
         //dom.addEventListener("mouseover",mouseMoveFun);
-        dom.addEventListener("mousemove", mouseMoveFun);
+        //dom.addEventListener("mousemove", mouseMoveFun);
         dom.addEventListener("click", e => {
-            avg.playSE({
-                src: "audio/game_over.mp3"
-                //默认 volume:1
-            });
+            //avg.playSE({
+            //    src: "audio/game_over.mp3"
+            //默认 volume:1
+            //});
         });
         avg.run(function () {
             avg.run(() => { console.log("First Time runFunction"); });
@@ -164,17 +164,11 @@
         avg.wait(1000);
         avg.run(() => {
             console.log("runSuccess1");
-            let speed = 0;
-            let speedX = 50;
-            let yPos = 0;
-            let xPos = 0;
-            speed = 6;
-            speedX = 6;
             avg.loadImage({
                 layer: 15,
                 src: "image/gifExample.png",
-                x: xPos,
-                y: yPos,
+                x: 0,
+                y: 0,
                 width: 100,
                 height: 100
             });
@@ -212,36 +206,49 @@
                 height: 100,
                 mask: "mask"
             });
-            requestAnimationFrame(function raf(t) {
-                //speed += 3;
-                //speedX *= 0.99;
-                yPos += speed;
-                xPos += speedX;
-                if (xPos > 1180) {
-                    xPos = 1180;
-                    speedX *= -1;
-                }
-                if (xPos < 0) {
-                    xPos = 0;
-                    speedX *= -1;
-                }
-                if (yPos >= 620) {
-                    yPos = 620;
-                    speed *= -1;
-                }
-                if (yPos < 0) {
-                    yPos = 0;
-                    speed *= -1;
-                }
+            let speed = 6;
+            let speedX = 6;
+            let yPos = 0;
+            let xPos = 0;
+            avg.loop(() => {
+                avg.run(() => {
+                    yPos += speed;
+                    xPos += speedX;
+                    if (xPos > 1180) {
+                        xPos = 1180;
+                        speedX *= -1;
+                    }
+                    if (xPos < 0) {
+                        xPos = 0;
+                        speedX *= -1;
+                    }
+                    if (yPos >= 620) {
+                        yPos = 620;
+                        speed *= -1;
+                    }
+                    if (yPos < 0) {
+                        yPos = 0;
+                        speed *= -1;
+                    }
+                });
                 avg.move({
                     layer: 15,
                     x: xPos,
                     y: yPos
                 }, 0);
+                avg.loadText({
+                    layer: 16,
+                    text: `${avg.mouse.x}px,${avg.mouse.y}px`,
+                    font: "12px Arial,'Microsoft Yahei'",
+                    color: "#cee5f5",
+                    x: 20,
+                    y: 22,
+                    alpha: 1
+                });
+                avg.run(() => {
+                    console.log(avg.getLayerClientRect(15));
+                });
                 avg.waitByFrame(1);
-                if (!(speed < 1 && speed > -1 && yPos > 619 && Math.abs(speedX) < 0.0001)) {
-                    requestAnimationFrame(raf);
-                }
             });
         });
         avg.run(function () {

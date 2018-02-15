@@ -211,26 +211,24 @@
             let yPos = 0;
             let xPos = 0;
             avg.loop(() => {
-                avg.run(() => {
-                    yPos += speed;
-                    xPos += speedX;
-                    if (xPos > 1180) {
-                        xPos = 1180;
-                        speedX *= -1;
-                    }
-                    if (xPos < 0) {
-                        xPos = 0;
-                        speedX *= -1;
-                    }
-                    if (yPos >= 620) {
-                        yPos = 620;
-                        speed *= -1;
-                    }
-                    if (yPos < 0) {
-                        yPos = 0;
-                        speed *= -1;
-                    }
-                });
+                yPos += speed;
+                xPos += speedX;
+                if (xPos > 1180) {
+                    xPos = 1180;
+                    speedX *= -1;
+                }
+                if (xPos < 0) {
+                    xPos = 0;
+                    speedX *= -1;
+                }
+                if (yPos >= 620) {
+                    yPos = 620;
+                    speed *= -1;
+                }
+                if (yPos < 0) {
+                    yPos = 0;
+                    speed *= -1;
+                }
                 avg.move({
                     layer: 15,
                     x: xPos,
@@ -251,78 +249,5 @@
         avg.run(function () {
             console.log("runSuccess2");
         });
-
-        // avg.wait(500);
-        // avg.loadImage({
-        //     layer: 2,
-        //     src: "image/01.JPG",
-        //     alpha: 0.5,
-        // });
-        // avg.move({
-        //     layer: 2,
-        //     x: Math.random() * 1000 - 200,
-        //     y: Math.random() * 300 - 100,
-        //     width: 400,
-        //     height: 340,
-        //     alpha: 1
-        // }, 2000);
-        // avg.loadImage({
-        //     layer: 3,
-        //     src: "image/01.JPG",
-        //     x: 480,
-        //     y: 270,
-        //     width: 480,
-        //     height: 270,
-        //     alpha: 0.5
-        // });
-        // avg.loadText({
-        //     layer:10,
-        //     text:"Hello Canvas!",
-        //     x:50,
-        //     y:50,
-        //     rotate:30
-        // });
-        // avg.wait(1000);
-        // avg.loadImage({
-        //     layer: 4,
-        //     src: "image/01.JPG",
-        //     x: 240, y: 135,
-        //     width: 240,
-        //     height: 135,
-        //     alpha: 0.3
-        // });
-        // avg.removeLayer(3);
-        // avg.loadImage({
-        //     layer: 3,
-        //     src: "image/gifExample.png",
-        //     //img: imgObj,
-        //     x: 640,
-        //     y: 135,
-        //     width: 60,
-        //     height: 60,
-        //     alpha: 1,
-        //     rotate: 945,
-        //     rotatePointX: 360,
-        //     rotatePointY: 255
-        // });
-        // //setTimeout(function () {
-        // avg.move({
-        //     layer: 3,
-        //     x: 240,
-        //     y: 135,
-        //     width: 240,
-        //     height: 240,
-        //     alpha: 0.5,
-        //     rotate: 45
-        // }, 1500);
-        // //}, 1);
-        // avg.wait(1000);
-        // avg.setColor(10,"#FFF");
-        // avg.move({
-        //     layer: 10,
-        //     x: 60,
-        //     y: 640,
-        //     rotate: 0
-        // }, 2000);
     </script>
 </body>

@@ -49,7 +49,7 @@
 
         var lineWidthDef = 48;
 
-        function drawLine(fromObj = { fromX = pointerFromX, fromY = pointerFromY }, toObj = { toX = pointerToX, toY = pointerToY }, lineWidth = lineWidthDef) {
+        function drawLine({ fromX = pointerFromX, fromY = pointerFromY } = {}, { toX = pointerToX, toY = pointerToY } = {}, lineWidth = lineWidthDef) {
             context2d.save();
             context2d.moveTo(fromX, fromY);
             context2d.lineTo(toX, toY);

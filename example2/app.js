@@ -10,7 +10,7 @@ const GAME_BG_RAND_LIST = new function () {
 let cheater = false;
 
 const GAME_BG = new Audio(GAME_BG_RAND_LIST);
-const GAME_SE = "audio/bullet.mp3";
+const GAME_SE = new Audio("audio/bullet.mp3");
 const GAME_SPEED = 90;
 const GAME_EASY = 180;
 
@@ -145,7 +145,7 @@ function gameOver() {
 function jump() {
     if (canPlay) {
         avg.playSE({
-            src: GAME_SE
+            audio: GAME_SE
         });
         speedy = -12;
     }

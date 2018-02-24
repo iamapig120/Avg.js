@@ -688,10 +688,16 @@
             resolve();
             if (audioBGM.readyState == 4) {
                 audioBGM.play();
+                if(audioBGM.currentTime > 0){
+                    audioBGM.currentTime = 0
+                }
                 //resolve();
             } else {
                 audioBGM.oncanplay = function() {
                     audioBGM.play();
+                    if(audioBGM.currentTime > 0){
+                        audioBGM.currentTime = 0
+                    }
                     //resolve();
                 };
             }
@@ -749,10 +755,16 @@
             resolve();
             if (target.readyState == 4) {
                 target.play();
+                if(target.currentTime > 0){
+                    target.currentTime = 0
+                }
                 //resolve();
             } else {
                 target.oncanplay = function() {
                     target.play();
+                    if(target.currentTime > 0){
+                        target.currentTime = 0
+                    }
                     //resolve();
                 };
             }

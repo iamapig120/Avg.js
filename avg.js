@@ -196,6 +196,9 @@
     //图像图层
     function imgLayerObj(p, resolve) {
         //if (p.src == null) return null;
+        /**
+         * @type {HTMLImageElement}
+         */
         this.img = p.img;
         this.layer = 0;
         this.x,
@@ -246,13 +249,13 @@
             state = 1;
             resolve();
         }
-        this.img.onload = function() {
+        this.img.addEventListener("load", e => {
             obj.width = p.width == null ? obj.img.width : p.width; //可选。要使用的图像的宽度。（伸展或缩小图像）
             obj.height = p.height == null ? obj.img.height : p.height; //可选。要使用的图像的宽度。（伸展或缩小图像）
             obj.swidth = p.swidth == null ? obj.img.width : p.swidth; //swidth	可选。被剪切图像的宽度。
             obj.sheight = p.sheight == null ? obj.img.height : p.sheight; //sheight	可选。被剪切图像的高度。
             if (state == 0) resolve();
-        };
+        });
         //this.img.src = p.src;
     }
     //文字图层
@@ -688,15 +691,15 @@
             resolve();
             if (audioBGM.readyState == 4) {
                 audioBGM.play();
-                if(audioBGM.currentTime > 0){
-                    audioBGM.currentTime = 0
+                if (audioBGM.currentTime > 0) {
+                    audioBGM.currentTime = 0;
                 }
                 //resolve();
             } else {
                 audioBGM.oncanplay = function() {
                     audioBGM.play();
-                    if(audioBGM.currentTime > 0){
-                        audioBGM.currentTime = 0
+                    if (audioBGM.currentTime > 0) {
+                        audioBGM.currentTime = 0;
                     }
                     //resolve();
                 };
@@ -755,15 +758,15 @@
             resolve();
             if (target.readyState == 4) {
                 target.play();
-                if(target.currentTime > 0){
-                    target.currentTime = 0
+                if (target.currentTime > 0) {
+                    target.currentTime = 0;
                 }
                 //resolve();
             } else {
                 target.oncanplay = function() {
                     target.play();
-                    if(target.currentTime > 0){
-                        target.currentTime = 0
+                    if (target.currentTime > 0) {
+                        target.currentTime = 0;
                     }
                     //resolve();
                 };

@@ -1,3 +1,402 @@
+/**事件队列
+ */
+class EventQueue {
+    constructor() {
+        this._queue = new Array();
+    }
+    /**
+     * 在队列中添加一个事件
+     * @param {function(function)} f 要添加的事件
+     */
+    add(f) {
+        this._queue.push(function(resolve) {
+            f(resolve);
+        });
+        if (!this._flag) {
+            this.next();
+        }
+    }
+    /**
+     * 队列中是否还有事件
+     */
+    hasNext() {
+        return this._queue.length > 0;
+    }
+    /**
+     * 执行下一个事件
+     */
+    next() {
+        const _this = this;
+        this._flag = true;
+        (async function() {
+            while (_this.hasNext()) {
+                await (function() {
+                    return new Promise(r => {
+                        _this._queue[0](r);
+                    });
+                })();
+                _this._queue.splice(0, 1);
+            }
+            _this._flag = false;
+        })();
+    }
+    /**
+     * 清空队列
+     */
+    clearQueue() {
+        this._queue.splice(0, this._queue.length);
+    }
+}
+/**循环队列
+ */
+class LoopQueue extends EventQueue {
+    /**
+     *
+     * @param {function} finishFun 要循环执行的事件
+     */
+    constructor(finishFun = () => {}) {
+        super();
+        this._loopFun = finishFun;
+    }
+    /**
+     * 执行下一个事件
+     */
+    next() {
+        const _this = this;
+        this._flag = true;
+        (async function() {
+            while (_this.hasNext()) {
+                await (function() {
+                    return new Promise(r => {
+                        _this._queue[0](r);
+                    });
+                })();
+                _this._queue.splice(0, 1);
+            }
+            _this._flag = false;
+            _this._loopFun();
+        })();
+    }
+    /**
+     * 设置循环Function
+     * @param {function} f 要循环的Function
+     */
+    setLoopFunction(f) {
+        if (typeof f === "function") {
+            _this._loopFun = f;
+        } else {
+            throw "Param is not a function!";
+        }
+    }
+    /**
+     * 清空队列
+     */
+    clearQueue() {
+        this._queue.splice(0, this._queue.length);
+        _this._loopFun = () => {};
+    }
+}
+/**图层类
+ */
+class Layer {
+    /**构造一个图层
+     * @param {Object} p 传入的参数
+     * @param {number} p.layer 图层号
+     * @param {number} [p.x = 0] 绘制于X
+     * @param {number} [p.y = 0] 绘制于Y
+     * @param {number} [p.alpha = 1] 图层透明度
+     * @param {number} [p.rotate = 0] 旋转角度
+     * @param {number} [p.rotatePointX = 0] 旋转中心点X
+     * @param {number} [p.rotatePointY = 0] 旋转中心点Y
+     * @param {number} [p.dx = 0] 绘制于X
+     * @param {number} [p.dy = 0] 绘制于Y
+     * @param {number} [p.rotatePointx = 0] 旋转中心点X
+     * @param {number} [p.rotatePointy = 0] 旋转中心点Y
+     */
+    constructor({
+        layer,
+        x = 0,
+        y = 0,
+        alpha = 1,
+        rotate = 0,
+        rotatePointX = 0,
+        rotatePointY = 0,
+        dx = x,
+        dy = y,
+        rotatePointx = rotatePointX,
+        rotatePointy = rotatePointY
+    } = {}) {}
+}
+
+/**图像图层类
+ */
+class ImageLayer extends Layer {
+    /**构造一个图像图层类
+     * @param {Object} p 传入的参数
+     * @param {number} p.layer 图层号
+     * @param {string} [p.src] 图片地址
+     * @param {HTMLImageElement} [p.img] 图片对象
+     * @param {number} [p.sx = 0] 裁剪开始于X
+     * @param {number} [p.sy = 0] 裁剪开始于Y
+     * @param {number} [p.swidth] 裁剪宽度
+     * @param {number} [p.sheight] 裁剪高度
+     * @param {number} [p.x = 0] 绘制于X
+     * @param {number} [p.y = 0] 绘制于Y
+     * @param {number} [p.width] 绘制宽度
+     * @param {number} [p.height] 绘制高度
+     * @param {number} [p.alpha = 1] 图层透明度
+     * @param {number} [p.rotate = 0] 旋转角度
+     * @param {number} [p.rotatePointX = 0] 旋转中心点X
+     * @param {number} [p.rotatePointY = 0] 旋转中心点Y
+     * @param {number} [p.sWidth] 裁剪宽度
+     * @param {number} [p.sHeight] 裁剪高度
+     * @param {number} [p.dWidth] 绘制宽度
+     * @param {number} [p.dHeight] 绘制高度
+     * @param {number} [p.dx = 0] 绘制于X
+     * @param {number} [p.dy = 0] 绘制于Y
+     * @param {number} [p.rotatePointx = 0] 旋转中心点X
+     * @param {number} [p.rotatePointy = 0] 旋转中心点Y
+     */
+    constructor({
+        layer,
+        sx,
+        sy,
+        swidth,
+        sheight,
+        x = 0,
+        y = 0,
+        width,
+        height,
+        alpha = 1,
+        rotate = 0,
+        rotatePointX = 0,
+        rotatePointY = 0,
+        sWidth = swidth,
+        sHeight = sheight,
+        dWidth = width,
+        dHeight = height,
+        dx = x,
+        dy = y,
+        rotatePointx = rotatePointX,
+        rotatePointy = rotatePointY
+    } = {}) {
+        super(arguments[0]);
+    }
+}
+/**Avg主类
+ */
+class Avg {
+    /**构造一个对象
+     * @param {Object} [p] 要传入的参数
+     * @param {HTMLCanvasElement} [p.target] 绘图板
+     * @param {number} [p.height = 720] canvas高度
+     * @param {number} [p.width = 1280] canvas宽度
+     */
+    constructor({
+        target = document.createElement("canvas"),
+        height = 720,
+        width = 1280
+    } = {}) {
+        /**主绘图板
+         * @type {HTMLCanvasElement}
+         */
+        this._canvasMain;
+        Object.defineProperty(this, "_canvasMain", {
+            value: target,
+            writable: false
+        });
+        /**遮罩层绘图板
+         * @type {HTMLCanvasElement}
+         */
+        this._canvasMask;
+        Object.defineProperty(this, "_canvasMask", {
+            value: document.createElement("canvas"),
+            writable: false
+        });
+        /**当前队列
+         * @type {EventQueue | LoopQueue}
+         */
+        this._eQ;
+        Object.defineProperty(this, "_eQ", {
+            value: this._nextEventQueue(),
+            writable: false
+        });
+
+        /**主绘图板画笔
+         * @type {CanvasRenderingContext2D}
+         */
+        this._paintBrush;
+        Object.defineProperty(this, "_paintBrush", {
+            value: this.getBrush(),
+            writable: false
+        });
+
+        /**遮罩层画笔
+         * @type {CanvasRenderingContext2D}
+         */
+        this._paintBrushForMask;
+        Object.defineProperty(this, "_paintBrushForMask", {
+            value: this.getBrush(true),
+            writable: false
+        });
+
+        /**图层记录
+         * @type {Array<Layer>}
+         */
+        this._layers;
+        Object.defineProperty(this, "_layers", {
+            value: new Array(),
+            writable: false
+        });
+    }
+    /**设置绘图板宽高
+     * @param {Object} [p] 要传入的参数
+     * @param {number} [p.height = 720] canvas高度
+     * @param {number} [p.width = 1280] canvas宽度
+     */
+    setSize({ width = 1280, height = 720 } = {}) {
+        [this.getCanvas(), this.getCanvas(true)].forEach(e => {
+            e.width = width;
+            e.height = height;
+        });
+    }
+    /**获取对象的绘图板
+     * @param {boolean} [mask = false] 是否要获取遮罩层绘图板
+     * @returns {HTMLCanvasElement} 获取到的Canvas对象
+     */
+    getCanvas(mask = false) {
+        return mask ? this._canvasMain : this._canvasMask;
+    }
+    /**获取对象绘图板的2D画笔
+     * @param {boolean} [mask = false] 是否要获取遮罩层绘图板画笔
+     * @returns {CanvasRenderingContext2D} 获取到的画笔
+     */
+    getBrush(mask = false) {
+        return (mask ? this._canvasMain : this._canvasMask).getContext("2d");
+    }
+    /**等待
+     * @param {numbet} t 要等待的毫秒数
+     */
+    wait(t) {
+        this._eQ.add(r => {
+            let startTime = performance.now();
+            t -= 13.34;
+            if (t < 0) t = 0;
+            let goneTime;
+            let raf = requestAnimationFrame(function waitCont() {
+                //console.log("inLoop");
+                goneTime = performance.now() - startTime;
+                if (goneTime >= t) {
+                    r();
+                } else {
+                    raf = requestAnimationFrame(waitCont);
+                }
+            });
+        });
+    }
+    /**等待，wait别名
+     * @param {numbet} t 要等待的毫秒数
+     */
+    sleep(t) {
+        this.wait(t);
+    }
+    /**按队列执行一个函数
+     * @param {function} f 要执行的函数
+     */
+    runFunction(f) {
+        this._eQ.add(async r => {
+            var resFlag = false;
+            //const EQ_BACKUP = eQ;
+            //eQ = nextEventQueue();
+            var error;
+            try {
+                await f();
+            } catch (e) {
+                //console.log("catch Error");
+                error = e;
+                if (e.info && e.info === "BREAK_BY_AVG") {
+                    e.plies--;
+                    if (e.plies <= 0) {
+                        resFlag = true;
+                        console.log("runFunction Broke");
+                    }
+                } else {
+                    console.log(e);
+                    console.log("runFunction runError");
+                }
+            } finally {
+                //eQ.stopQueue(); //No Use
+
+                //eQ = lastEventQueue();
+                //eQ = EQ_BACKUP;
+                r();
+                if (!resFlag && error) {
+                    throw error;
+                }
+            }
+        });
+    }
+    /**按队列执行一个函数，runFunction别名
+     * @param {function} f 要执行的函数
+     */
+    run(f) {
+        this.runFunction(f);
+    }
+    /**从事件队列中请求下一个队列
+     * @param {"eventQueue" | "loopQueue"} [type = "eventQueue"]  请求的队列类型
+     * @param {function} [finishFun] 如果是一个循环队列，要循环执行的Function
+     * @returns {EventQueue | LoopQueue} 返回的队列
+     */
+    _nextEventQueue(type = "eventQueue", finishFun = () => {}) {
+        /**
+         * @type {number} 当前队列的下标
+         */
+        this._eQPointer;
+        /**
+         * @type {Array<EventQueue | LoopQueue>} 所有的事件队列
+         */
+        this._eQArray;
+
+        if (typeof this._eQPointer === "undefined" || !this._eQArray) {
+            this._eQPointer = -1;
+            this._eQArray = new Array();
+        }
+        this._eQPointer++;
+        if (!this._eQArray[this._eQPointer]) {
+            switch (type) {
+                case "eventQueue": {
+                    this._eQArray[this._eQPointer] = new EventQueue();
+                    break;
+                }
+                case "loopQueue": {
+                    this._eQArray[this._eQPointer] = new LoopQueue();
+                    break;
+                }
+            }
+        }
+        this._eQArray[this._eQPointer].clearQueue();
+        if (
+            this._eQArray[this._eQPointer].__proto__.constructor === LoopQueue
+        ) {
+            this._eQArray[this._eQPointer].setLoopFunction(finishFun);
+        }
+        return this._eQArray[this._eQPointer];
+    }
+    /**从事件队列中请求上一个队列
+     * @returns {EventQueue | LoopQueue} 返回的队列
+     */
+    _lastEventQueue() {
+        if (typeof this._eQPointer === "undefined" || !this._eQArray) {
+            throw "No Queque in Array!";
+        }
+        this._eQPointer--;
+        if (this._eQPointer < 0) {
+            this._eQPointer = 0;
+        }
+        return this._eQArray[this._eQPointer];
+    }
+}
+
 (function(window, undefined) {
     // 构造对象
     // 部分抄袭来自jQuery

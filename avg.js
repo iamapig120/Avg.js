@@ -4,8 +4,7 @@ class EventQueue {
     constructor() {
         this._queue = new Array();
     }
-    /**
-     * 在队列中添加一个事件
+    /**在队列中添加一个事件
      * @param {function(function)} f 要添加的事件
      */
     add(f) {
@@ -16,14 +15,12 @@ class EventQueue {
             this.next();
         }
     }
-    /**
-     * 队列中是否还有事件
+    /**队列中是否还有事件
      */
     hasNext() {
         return this._queue.length > 0;
     }
-    /**
-     * 执行下一个事件
+    /**执行下一个事件
      */
     next() {
         const _this = this;
@@ -40,8 +37,7 @@ class EventQueue {
             _this._flag = false;
         })();
     }
-    /**
-     * 清空队列
+    /**清空队列
      */
     clearQueue() {
         this._queue.splice(0, this._queue.length);
@@ -50,16 +46,14 @@ class EventQueue {
 /**循环队列
  */
 class LoopQueue extends EventQueue {
-    /**
-     *
+    /**构造一个循环队列
      * @param {function} finishFun 要循环执行的事件
      */
     constructor(finishFun = () => {}) {
         super();
         this._loopFun = finishFun;
     }
-    /**
-     * 执行下一个事件
+    /**执行下一个事件
      */
     next() {
         const _this = this;
@@ -77,8 +71,7 @@ class LoopQueue extends EventQueue {
             _this._loopFun();
         })();
     }
-    /**
-     * 设置循环Function
+    /**设置循环Function
      * @param {function} f 要循环的Function
      */
     setLoopFunction(f) {
@@ -88,8 +81,7 @@ class LoopQueue extends EventQueue {
             throw "Param is not a function!";
         }
     }
-    /**
-     * 清空队列
+    /**清空队列
      */
     clearQueue() {
         this._queue.splice(0, this._queue.length);
@@ -125,9 +117,44 @@ class Layer {
         dy = y,
         rotatePointx = rotatePointX,
         rotatePointy = rotatePointY
-    } = {}) {}
+    } = {}) {
+        if (typeof layer !== "number") {
+            throw "params must have 'layer:<number>'";
+        }
+        /**
+         * @type {number} 图层号
+         */
+        this.layer = layer;
+        /**
+         * @type {number} 在x坐标绘制
+         */
+        this.dx = dx;
+        /**
+         * @type {number} 在y坐标绘制
+         */
+        this.dy = dy;
+        /**
+         * @type {number} 透明度0~1
+         */
+        this.alpha = alpha;
+        /**
+         * @type {number} 旋转角度
+         */
+        this.rotate = rotate;
+        /**
+         * @type {number} 旋转中心点x
+         */
+        this.rotatePointx = rotatePointx;
+        /**
+         * @type {number} 旋转中心点y
+         */
+        this.rotatePointy = rotatePointy;
+        /**
+         * @type {number} 图层类型
+         */
+        this.type;
+    }
 }
-
 /**图像图层类
  */
 class ImageLayer extends Layer {
@@ -181,6 +208,7 @@ class ImageLayer extends Layer {
         rotatePointy = rotatePointY
     } = {}) {
         super(arguments[0]);
+
     }
 }
 /**Avg主类
@@ -306,13 +334,10 @@ class Avg {
     runFunction(f) {
         this._eQ.add(async r => {
             var resFlag = false;
-            //const EQ_BACKUP = eQ;
-            //eQ = nextEventQueue();
             var error;
             try {
                 await f();
             } catch (e) {
-                //console.log("catch Error");
                 error = e;
                 if (e.info && e.info === "BREAK_BY_AVG") {
                     e.plies--;
@@ -325,10 +350,6 @@ class Avg {
                     console.log("runFunction runError");
                 }
             } finally {
-                //eQ.stopQueue(); //No Use
-
-                //eQ = lastEventQueue();
-                //eQ = EQ_BACKUP;
                 r();
                 if (!resFlag && error) {
                     throw error;

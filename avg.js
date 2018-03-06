@@ -41,6 +41,7 @@ class EventQueue {
      */
     clearQueue() {
         this._queue.splice(0, this._queue.length);
+        this._flag = false;
     }
 }
 /**循环队列
@@ -48,10 +49,15 @@ class EventQueue {
 class LoopQueue extends EventQueue {
     /**构造一个循环队列
      * @param {function} finishFun 要循环执行的事件
+     * @param {function} resloveFunction 中断循环时的reslove方法
      */
-    constructor(finishFun = () => {}) {
+    constructor(
+        finishFun = () => {},
+        resloveFunction = () => new Promise(r => r())
+    ) {
         super();
         this._loopFun = finishFun;
+        this._resFun = resloveFunction;
     }
     /**执行下一个事件
      */
@@ -76,16 +82,24 @@ class LoopQueue extends EventQueue {
      */
     setLoopFunction(f) {
         if (typeof f === "function") {
-            _this._loopFun = f;
+            this._loopFun = f;
         } else {
             throw "Param is not a function!";
         }
+    }
+    /**设置中断循环后的reslove函数
+     * @param {function} f reslove函数
+     */
+    setResloveFunction(f) {
+        this._resFun = f;
     }
     /**清空队列
      */
     clearQueue() {
         this._queue.splice(0, this._queue.length);
-        _this._loopFun = () => {};
+        this._flag = false;
+        this._loopFun = () => {};
+        this._resFun();
     }
 }
 /**图层类
@@ -208,7 +222,6 @@ class ImageLayer extends Layer {
         rotatePointy = rotatePointY
     } = {}) {
         super(arguments[0]);
-
     }
 }
 /**Avg主类
@@ -244,11 +257,7 @@ class Avg {
         /**当前队列
          * @type {EventQueue | LoopQueue}
          */
-        this._eQ;
-        Object.defineProperty(this, "_eQ", {
-            value: this._nextEventQueue(),
-            writable: false
-        });
+        this._eQ = this._nextEventQueue();
 
         /**主绘图板画笔
          * @type {CanvasRenderingContext2D}
@@ -276,6 +285,10 @@ class Avg {
             value: new Array(),
             writable: false
         });
+        /**嵌套循环层数
+         * @type {number}
+         */
+        this._loopPliesCount = 0;
     }
     /**设置绘图板宽高
      * @param {Object} [p] 要传入的参数
@@ -333,27 +346,25 @@ class Avg {
      */
     runFunction(f) {
         this._eQ.add(async r => {
-            var resFlag = false;
-            var error;
             try {
                 await f();
             } catch (e) {
-                error = e;
                 if (e.info && e.info === "BREAK_BY_AVG") {
-                    e.plies--;
-                    if (e.plies <= 0) {
-                        resFlag = true;
-                        console.log("runFunction Broke");
+                    if (e.plies <= this._loopPliesCount) {
+                        this._loopPliesCount -= e.plies;
+                        for (let i = 0; i < e.plies; i++) {
+                            this._eQ.clearQueue();
+                            this._eQ = this._lastEventQueue();
+                        }
+                    } else {
+                        throw "break loops' param too large";
                     }
                 } else {
-                    console.log(e);
                     console.log("runFunction runError");
+                    throw e;
                 }
             } finally {
                 r();
-                if (!resFlag && error) {
-                    throw error;
-                }
             }
         });
     }
@@ -363,12 +374,54 @@ class Avg {
     run(f) {
         this.runFunction(f);
     }
+    /**按队列并循环一个函数
+     * @param {function} f 要循环执行的函数
+     */
+    loopFunction(f) {
+        this._eQ.add(async r => {
+            this._loopPliesCount++;
+            this._eQ = this._nextEventQueue(
+                "loopQueue",
+                () => {
+                    this.runFunction(f);
+                },
+                r
+            );
+            this.runFunction(f);
+        });
+    }
+    /**按队列并循环一个函数，loopFunction别名
+     * @param {function} f 要循环执行的函数
+     */
+    loop(f) {
+        this.loopFunction(f);
+    }
+    /**中断事件的执行
+     * @param {number} plies 中断层数
+     */
+    breakLoopFunction(plies = 1) {
+        if (typeof plies !== "number") {
+            throw "can not break function by a wrong plies";
+        }
+        throw { plies: plies, info: "BREAK_BY_AVG" };
+    }
+    /**中断事件的执行，breakLoopFunction别名
+     * @param {number} plies 中断层数
+     */
+    break(plies = 1) {
+        this.breakLoopFunction(plies);
+    }
     /**从事件队列中请求下一个队列
      * @param {"eventQueue" | "loopQueue"} [type = "eventQueue"]  请求的队列类型
      * @param {function} [finishFun] 如果是一个循环队列，要循环执行的Function
+     * @param {function} [resloveFunction] 如果是一个循环队列，reslove函数
      * @returns {EventQueue | LoopQueue} 返回的队列
      */
-    _nextEventQueue(type = "eventQueue", finishFun = () => {}) {
+    _nextEventQueue(
+        type = "eventQueue",
+        finishFun = () => {},
+        resloveFunction = () => new Promise(r => r())
+    ) {
         /**
          * @type {number} 当前队列的下标
          */
@@ -395,11 +448,12 @@ class Avg {
                 }
             }
         }
-        this._eQArray[this._eQPointer].clearQueue();
+        //this._eQArray[this._eQPointer].clearQueue();
         if (
             this._eQArray[this._eQPointer].__proto__.constructor === LoopQueue
         ) {
             this._eQArray[this._eQPointer].setLoopFunction(finishFun);
+            this._eQArray[this._eQPointer].setResloveFunction(resloveFunction);
         }
         return this._eQArray[this._eQPointer];
     }
@@ -558,11 +612,12 @@ class Avg {
                     _this._queue.splice(0, 1);
                 }
                 _this._flag = false;
-                _this._loopFun();
+                avg.run(() => _this._loopFun());
             })();
         }
         clearQueue() {
             this._queue.splice(0, this._queue.length);
+            _this._loopFun = () => {};
         }
     }
     /**
@@ -1205,16 +1260,18 @@ class Avg {
         try {
             f();
         } catch (e) {
+            //console.log(e);
             //console.log("catch Error");
             error = e;
             if (e.info && e.info === "BREAK_BY_AVG") {
-                e.plies--;
+                e.plies -= 1;
                 if (e.plies <= 0) {
                     resFlag = true;
+                    eQ = lastEventQueue();
                     console.log("runFunction Broke");
                 }
             } else {
-                console.log(e);
+                //console.log(e);
                 console.log("runFunction runError");
             }
         } finally {
@@ -1222,8 +1279,11 @@ class Avg {
 
             //eQ = lastEventQueue();
             //eQ = EQ_BACKUP;
+            //console.log(error ? true + (!resFlag ? true : false) : false);
             resolve();
             if (!resFlag && error) {
+                //console.log("throwE");
+
                 throw error;
             }
         }
@@ -1231,33 +1291,36 @@ class Avg {
     //循环事件
     function loopFunction(f, resolve) {
         var resFlag = false;
+        var _this = this;
         //const EQ_BACKUP = eQ;
         var error;
-        try {
-            eQ = nextEventQueue("loopQueue", f);
-            f();
-        } catch (e) {
-            //console.log("catch Error");
-            error = e;
-            if (e.info && e.info === "BREAK_BY_AVG") {
-                e.plies--;
-                if (e.plies <= 0) {
-                    resFlag = true;
-                    console.log("loopFunction Broke");
-                }
-                eQ.clearQueue();
-                eQ = lastEventQueue();
-                //eQ = EQ_BACKUP;
-                resolve();
-                if (!resFlag && error) {
-                    throw error;
-                }
-            } else {
-                console.log(e);
-                console.log("runFunction runError");
-            }
-            resolve();
-        }
+        // try {
+        eQ = nextEventQueue("loopQueue", () => {
+            f.call(_this);
+        });
+        f.call(_this);
+        // } catch (e) {
+        //     console.log(e);
+        //     error = e;
+        //     if (e.info && e.info === "BREAK_BY_AVG") {
+        //         e.plies--;
+        //         if (e.plies <= 0) {
+        //             resFlag = true;
+        //             console.log("loopFunction Broke");
+        //         }
+        //         eQ.clearQueue();
+        //         eQ = lastEventQueue();
+        //         //eQ = EQ_BACKUP;
+        //         resolve();
+        //         if (!resFlag && error) {
+        //             throw error;
+        //         }
+        //     } else {
+        //         console.log(e);
+        //         console.log("runFunction runError");
+        //     }
+        //     resolve();
+        // }
     }
     function breakFunction(plies = 1) {
         throw { plies: plies, info: "BREAK_BY_AVG" };

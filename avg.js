@@ -1,3 +1,17 @@
+const LAYER_TYPE_IMAGE = "image";
+const LAYER_TYPE_TEXT = "text";
+
+/**在原型链查找一个构造函数并对应情况执行
+ * @param {any} obj 要测试的对象
+ * @param {Array<Array<Function>>} switchs 对于所有可能的情况的键值对
+ */
+const switchInstanceof = (obj, switchs) => {
+    switchs.forEach(e => {
+        if (obj instanceof e[0]) {
+            e[1](obj);
+        }
+    });
+};
 /**事件队列
  */
 class EventQueue {
@@ -118,6 +132,7 @@ class Layer {
      * @param {number} [p.dy = 0] 绘制于Y
      * @param {number} [p.rotatePointx = 0] 旋转中心点X
      * @param {number} [p.rotatePointy = 0] 旋转中心点Y
+     * @param {"shade" | "mask" | false} [p.mask = false] 图层叠加顺序
      */
     constructor({
         layer,
@@ -130,7 +145,8 @@ class Layer {
         dx = x,
         dy = y,
         rotatePointx = rotatePointX,
-        rotatePointy = rotatePointY
+        rotatePointy = rotatePointY,
+        mask = false
     } = {}) {
         if (typeof layer !== "number") {
             throw "params must have 'layer:<number>'";
@@ -164,6 +180,10 @@ class Layer {
          */
         this.rotatePointy = rotatePointy;
         /**
+         * @type {"shade" | "mask" | false} 叠加模式
+         */
+        this.mask = mask;
+        /**
          * @type {number} 图层类型
          */
         this.type;
@@ -176,7 +196,7 @@ class ImageLayer extends Layer {
      * @param {Object} p 传入的参数
      * @param {number} p.layer 图层号
      * @param {string} [p.src] 图片地址
-     * @param {HTMLImageElement} [p.img] 图片对象
+     * @param {HTMLImageElement | HTMLCanvasElement} [p.img] 图片对象
      * @param {number} [p.sx = 0] 裁剪开始于X
      * @param {number} [p.sy = 0] 裁剪开始于Y
      * @param {number} [p.swidth] 裁剪宽度
@@ -197,11 +217,12 @@ class ImageLayer extends Layer {
      * @param {number} [p.dy = 0] 绘制于Y
      * @param {number} [p.rotatePointx = 0] 旋转中心点X
      * @param {number} [p.rotatePointy = 0] 旋转中心点Y
+     * @param {"shade" | "mask" | false} [p.mask = false] 图层叠加顺序
      */
     constructor({
         layer,
-        sx,
-        sy,
+        sx = 0,
+        sy = 0,
         swidth,
         sheight,
         x = 0,
@@ -219,9 +240,63 @@ class ImageLayer extends Layer {
         dx = x,
         dy = y,
         rotatePointx = rotatePointX,
-        rotatePointy = rotatePointY
+        rotatePointy = rotatePointY,
+        mask = false,
+        src,
+        img = new Image()
     } = {}) {
         super(arguments[0]);
+        this.type = LAYER_TYPE_IMAGE;
+        this.img = img;
+        this.sx = sx;
+        this.sy = sy;
+
+        const isNum = test => typeof test === "number";
+
+        if (isNum(dWidth)) this.dWidth = dWidth;
+        if (isNum(dHeight)) this.dHeight = dHeight;
+        if (isNum(sWidth)) this.sWidth = sWidth;
+        if (isNum(sHeight)) this.sHeight = sHeight;
+
+        switchInstanceof(this.img, [
+            [
+                HTMLImageElement,
+                e => {
+                    const setProp = () => {
+                        if (!isNum(this.dWidth)) this.dWidth = e.naturalWidth;
+                        if (!isNum(this.dHeight))
+                            this.dHeight = e.naturalHeight;
+                        if (!isNum(this.sWidth)) this.sWidth = e.naturalWidth;
+                        if (!isNum(this.sHeight))
+                            this.sHeight = e.naturalHeight;
+                    };
+                    if (src) {
+                        this.img.src = src;
+                    }
+                    if (this.img.complete) {
+                        setProp();
+                    } else {
+                        const autoSetProp = () => {
+                            setProp();
+                            this.img.removeEventListener("load", autoSetProp);
+                        };
+                        this.img.addEventListener("load", autoSetProp);
+                    }
+                }
+            ],
+            [
+                HTMLCanvasElement,
+                e => {
+                    const setProp = () => {
+                        if (!isNum(this.dWidth)) this.dWidth = e.width;
+                        if (!isNum(this.dHeight)) this.dHeight = e.height;
+                        if (!isNum(this.sWidth)) this.sWidth = e.width;
+                        if (!isNum(this.sHeight)) this.sHeight = e.height;
+                    };
+                    setProp();
+                }
+            ]
+        ]);
     }
 }
 /**Avg主类

@@ -100,7 +100,7 @@ class LoopQueue extends EventQueue {
         if (typeof f === "function") {
             this._loopFun = f;
         } else {
-            throw "Param is not a function!";
+            throw "LoopFunction Param is not a function!";
         }
     }
     /**设置中断循环后的reslove函数
@@ -189,6 +189,10 @@ class Layer {
          * @type {number} 图层类型
          */
         this.type;
+        /**
+         * @type {HTMLImageElement | HTMLCanvasElement} 图层像素图
+         */
+        this.pixel;
     }
 }
 /**图像图层类
@@ -249,7 +253,7 @@ class ImageLayer extends Layer {
     } = {}) {
         super(arguments[0]);
         this.type = LAYER_TYPE_IMAGE;
-        this.img = img;
+        this.pixel = img;
         this.sx = sx;
         this.sy = sy;
 
@@ -260,7 +264,7 @@ class ImageLayer extends Layer {
         if (isNum(sWidth)) this.sWidth = sWidth;
         if (isNum(sHeight)) this.sHeight = sHeight;
 
-        switchInstanceof(this.img, [
+        switchInstanceof(this.pixel, [
             [
                 HTMLImageElement,
                 e => {
@@ -273,16 +277,16 @@ class ImageLayer extends Layer {
                             this.sHeight = e.naturalHeight;
                     };
                     if (src) {
-                        this.img.src = src;
+                        this.pixel.src = src;
                     }
-                    if (this.img.complete) {
+                    if (this.pixel.complete) {
                         setProp();
                     } else {
                         const autoSetProp = () => {
                             setProp();
-                            this.img.removeEventListener("load", autoSetProp);
+                            this.pixel.removeEventListener("load", autoSetProp);
                         };
-                        this.img.addEventListener("load", autoSetProp);
+                        this.pixel.addEventListener("load", autoSetProp);
                     }
                 }
             ],

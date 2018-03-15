@@ -1,0 +1,25 @@
+{
+  "name": "avg_js",
+  "version": "0.2.0",
+  "description": "<img src=\"https://img.shields.io/badge/Avg.js-dev-yellow.svg?style=flat\">",
+  "main": "avg.js",
+  "directories": {
+    "example": "example"
+  },
+  "dependencies": {
+    "webpack-cli": "^2.0.12"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "webpack": "^4.1.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node_modules/.bin/webpack"
+  },
+  "author": "Handle",
+  "license": "ISC"
+}

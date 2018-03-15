@@ -1,5 +1,6 @@
 import * as con from "../const/const";
 import { Layer } from "./Layer";
+import { isNum, switchInstanceof } from "../function/fun";
 
 /**图像图层类
  */
@@ -63,12 +64,18 @@ class ImageLayer extends Layer {
         this.sx = sx;
         this.sy = sy;
 
-        const isNum = test => typeof test === "number";
-
-        if (isNum(dWidth)) this.dWidth = dWidth;
-        if (isNum(dHeight)) this.dHeight = dHeight;
-        if (isNum(sWidth)) this.sWidth = sWidth;
-        if (isNum(sHeight)) this.sHeight = sHeight;
+        if (isNum(dWidth)) {
+            this.dWidth = dWidth;
+        }
+        if (isNum(dHeight)) {
+            this.dHeight = dHeight;
+        }
+        if (isNum(sWidth)) {
+            this.sWidth = sWidth;
+        }
+        if (isNum(sHeight)) {
+            this.sHeight = sHeight;
+        }
 
         switchInstanceof(this.pixel, [
             [

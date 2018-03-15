@@ -9,4 +9,10 @@ const switchInstanceof = (obj, switchs) => {
         }
     });
 };
-export { switchInstanceof };
+
+/**判断类型是不是number
+ * @param {any} test 要测试的对象
+ */
+const isNum = test => typeof test === "number";
+
+export { switchInstanceof, isNum };

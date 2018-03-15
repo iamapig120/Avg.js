@@ -73,6 +73,14 @@ class Layer {
          * @type {HTMLImageElement | HTMLCanvasElement} 图层像素图
          */
         this.pixel;
+        /**
+         * @type {number} 图层宽度
+         */
+        this.dWidth;
+        /**
+         * @type {number} 图层高度
+         */
+        this.dHeight;
     }
 }
 

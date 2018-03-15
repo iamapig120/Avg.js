@@ -38,15 +38,20 @@ class TextLayer extends Layer {
         font = con.DEFUALT_FONT
     } = {}) {
         super(arguments[0]);
+
         this.type = con.LAYER_TYPE_TEXT;
-        this.text = text;
-        this.font = font;
+
+        this.pixel = document.createElement("canvas");
+        this._ctx = this.pixel.getContext("2d");
+
+        this.setText(text);
+        this.setFont(font);
     }
     /**设置文本图层的字符串内容
      * @param {string} text 要设置为的字符串
      */
     setText(text) {
-        if (typeof text === "string" || text.toString) {
+        if (text.toString) {
             return "" + text;
         } else {
             return false;
@@ -55,12 +60,30 @@ class TextLayer extends Layer {
     /**设置文本图层的字体
      * @param {string} text 要设置为的字体
      */
-    setFont(font) {
-        if (typeof font === "string" || font.toString) {
-            return "" + font;
+    setFont(font = this.font) {
+        if (font.toString) {
+            this.font = font.toString();
+            this._drawText();
+            return font.toString();
         } else {
             return false;
         }
+    }
+    /**重新绘制文本到canvas
+     * @param {string} text 要绘制的文本
+     */
+    _drawText(text = this.text) {
+        const textArr = text.split("\n");
+        let maxWidth = 0;
+        let temp;
+        textArr.forEach(t => {
+            temp = this._ctx.measureText(t).width;
+            if (temp > maxWidth) {
+                maxWidth = Math.ceil(temp);
+            }
+        });
+        this.pixel.width = maxWidth;
+        this.dWidth = this.pixel.width;
     }
 }
 

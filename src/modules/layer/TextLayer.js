@@ -44,6 +44,8 @@ class TextLayer extends Layer {
         this.pixel = document.createElement("canvas");
         this._ctx = this.pixel.getContext("2d");
 
+        this._ctx.textBaseline = "top";
+
         this.setText(text);
         this.setFont(font);
     }

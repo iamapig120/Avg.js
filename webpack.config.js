@@ -6,17 +6,17 @@ module.exports = {
         filename: "avg.min.js"
     },
     module: {
-        // rules: [
-        //     {
-        //         test: /(\.jsx|\.js)$/,
-        //         use: {
-        //             loader: "babel-loader",
-        //             options: {
-        //                 presets: ["env"]
-        //             }
-        //         },
-        //         exclude: /node_modules/
-        //     }
-        // ]
+        rules: [
+            {
+                test: /(\.jsx|\.js)$/,
+                use: {
+                    loader: "babel-loader",
+                    options: {
+                        presets: ["env"]
+                    }
+                },
+                exclude: /node_modules/
+            }
+        ]
     }
 };

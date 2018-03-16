@@ -98,7 +98,7 @@ class Avg {
         return (mask ? this._canvasMain : this._canvasMask).getContext("2d");
     }
     /**等待
-     * @param {numbet} t 要等待的毫秒数
+     * @param {number} t 要等待的毫秒数
      */
     wait(t) {
         this._eQ.add(r => {
@@ -118,7 +118,7 @@ class Avg {
         });
     }
     /**等待，wait别名
-     * @param {numbet} t 要等待的毫秒数
+     * @param {number} t 要等待的毫秒数
      */
     sleep(t) {
         this.wait(t);
@@ -185,7 +185,7 @@ class Avg {
                 this._loopPliesCount -= plies;
                 for (let i = 0; i < plies; i++) {
                     this._eQ.clearQueue();
-                    this._eQ = this._lastEventQueue;
+                    this._eQ = this._lastEventQueue();
                 }
             }
             r();
@@ -200,13 +200,13 @@ class Avg {
     /**从事件队列中请求下一个队列
      * @param {"eventQueue" | "loopQueue"} [type = "eventQueue"]  请求的队列类型
      * @param {function} [finishFun] 如果是一个循环队列，要循环执行的Function
-     * @param {function} [resloveFunction] 如果是一个循环队列，reslove函数
+     * @param {function} [resolveFunction] 如果是一个循环队列，resolve函数
      * @returns {EventQueue | LoopQueue} 返回的队列
      */
     _nextEventQueue(
         type = "eventQueue",
         finishFun = () => {},
-        resloveFunction = () => new Promise(r => r())
+        resolveFunction = () => new Promise(r => r())
     ) {
         /**
          * @type {number} 当前队列的下标
@@ -222,7 +222,7 @@ class Avg {
             this._eQArray = new Array();
         }
         this._eQPointer++;
-
+        console.log("next");
         if (!this._eQArray[this._eQPointer]) {
             switch (type) {
                 case "eventQueue": {
@@ -239,7 +239,7 @@ class Avg {
         if (
             this._eQArray[this._eQPointer].__proto__.constructor === LoopQueue
         ) {
-            this._eQArray[this._eQPointer].setResloveFunction(resloveFunction);
+            this._eQArray[this._eQPointer].setResolveFunction(resolveFunction);
             this._eQArray[this._eQPointer].setLoopFunction(finishFun);
             this._eQArray[this._eQPointer].next();
         }
@@ -253,6 +253,7 @@ class Avg {
             throw "No Queque in Array!";
         }
         this._eQPointer--;
+        console.log("last");
         if (this._eQPointer < 0) {
             this._eQPointer = 0;
         }

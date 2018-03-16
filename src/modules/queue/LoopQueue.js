@@ -5,15 +5,15 @@ import { EventQueue } from "./EventQueue.js";
 class LoopQueue extends EventQueue {
     /**构造一个循环队列
      * @param {function} finishFun 要循环执行的事件
-     * @param {function} resloveFunction 中断循环时的reslove方法
+     * @param {function} resolveFunction 中断循环时的reslove方法
      */
     constructor(
         finishFun = () => {},
-        resloveFunction = () => new Promise(r => r())
+        resolveFunction = () => new Promise(r => r())
     ) {
         super();
         this._loopFun = finishFun;
-        this._resFun = resloveFunction;
+        this._resFun = resolveFunction;
         this._flag = false;
     }
     /**执行下一个事件
@@ -44,7 +44,7 @@ class LoopQueue extends EventQueue {
     /**设置中断循环后的reslove函数
      * @param {function} f reslove函数
      */
-    setResloveFunction(f) {
+    setResolveFunction(f) {
         this._resFun = f;
     }
     /**清空队列

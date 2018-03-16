@@ -2,7 +2,11 @@
  */
 class EventQueue {
     constructor() {
+        /**
+         * @type {Arrat<Function>} 存储事件的数组
+         */
         this._queue = new Array();
+        this._timeout;
     }
     /**在队列中添加一个事件
      * @param {function(function)} f 要添加的事件
@@ -11,9 +15,7 @@ class EventQueue {
         this._queue.push(function(resolve) {
             f(resolve);
         });
-        if (!this._flag) {
-            this.next();
-        }
+        this.next();
     }
     /**队列中是否还有事件
      */
@@ -23,10 +25,17 @@ class EventQueue {
     /**执行下一个事件
      */
     next() {
+        if (!this._flag) {
+            this._flag = true;
+            this._timeout = setTimeout(() => {
+                this.nextSync();
+            }, 0);
+        }
+    }
+    nextSync() {
         const _this = this;
-        this._flag = true;
         (async function() {
-            while (_this.hasNext()) {
+            while (_this.hasNext() && _this._flag) {
                 await new Promise(r => {
                     _this._queue[0](r);
                 });
@@ -38,8 +47,9 @@ class EventQueue {
     /**清空队列
      */
     clearQueue() {
-        this._queue.splice(0, this._queue.length);
+        this._queue = new Array();
         this._flag = false;
+        clearTimeout(this._timeout);
     }
 }
 

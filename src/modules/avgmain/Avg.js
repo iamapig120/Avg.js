@@ -147,7 +147,6 @@ class Avg {
             //     }
             // } finally {
             r();
-            //}
         });
     }
     /**按队列执行一个函数，runFunction别名
@@ -167,10 +166,7 @@ class Avg {
                 () => {
                     this.runFunction(f);
                 },
-                () => {
-                    console.log("resolve");
-                    r();
-                }
+                r
             );
         });
     }
@@ -186,7 +182,7 @@ class Avg {
     breakLoopFunction(plies = 1) {
         this._eQ.add(r => {
             if (plies <= this._loopPliesCount) {
-                this._loopPliesCount -= e.plies;
+                this._loopPliesCount -= plies;
                 for (let i = 0; i < plies; i++) {
                     this._eQ.clearQueue();
                     this._eQ = this._lastEventQueue;
@@ -243,8 +239,9 @@ class Avg {
         if (
             this._eQArray[this._eQPointer].__proto__.constructor === LoopQueue
         ) {
-            this._eQArray[this._eQPointer].setLoopFunction(finishFun);
             this._eQArray[this._eQPointer].setResloveFunction(resloveFunction);
+            this._eQArray[this._eQPointer].setLoopFunction(finishFun);
+            this._eQArray[this._eQPointer].next();
         }
         return this._eQArray[this._eQPointer];
     }

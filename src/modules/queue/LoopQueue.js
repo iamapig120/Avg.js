@@ -14,14 +14,14 @@ class LoopQueue extends EventQueue {
         super();
         this._loopFun = finishFun;
         this._resFun = resloveFunction;
+        this._flag = false;
     }
     /**执行下一个事件
      */
-    next() {
+    nextSync() {
         const _this = this;
-        this._flag = true;
         (async function() {
-            while (_this.hasNext()) {
+            while (_this.hasNext() && _this._flag) {
                 await new Promise(r => {
                     _this._queue[0](r);
                 });
@@ -46,15 +46,16 @@ class LoopQueue extends EventQueue {
      */
     setResloveFunction(f) {
         this._resFun = f;
-        if (!this.hasNext()) {
-            this.next();
-        }
     }
     /**清空队列
      */
     clearQueue() {
-        this._queue.splice(0, this._queue.length);
+        /**
+         * @type {Array<Function>} 存储事件的数组
+         */
+        this._queue = new Array();
         this._flag = false;
+        clearTimeout(this._timeout);
         this._loopFun = () => {};
         this._resFun();
     }

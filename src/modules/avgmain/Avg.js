@@ -1,12 +1,10 @@
-import * as con from "../const/const";
+import { switchInstanceof } from "../function/fun.js";
 
-import { switchInstanceof } from "../function/fun";
+import { EventQueue } from "../queue/EventQueue.js";
+import { LoopQueue } from "../queue/LoopQueue.js";
 
-import { EventQueue } from "../queue/EventQueue";
-import { LoopQueue } from "../queue/LoopQueue";
-
-import { ImageLayer } from "../layer/ImageLayer";
-import { TextLayer } from "../layer/TextLayer";
+import { ImageLayer } from "../layer/ImageLayer.js";
+import { TextLayer } from "../layer/TextLayer.js";
 
 /**Avg主类
  */
@@ -130,26 +128,26 @@ class Avg {
      */
     runFunction(f) {
         this._eQ.add(async r => {
-            try {
-                await f();
-            } catch (e) {
-                if (e.info && e.info === "BREAK_BY_AVG") {
-                    if (e.plies <= this._loopPliesCount) {
-                        this._loopPliesCount -= e.plies;
-                        for (let i = 0; i < e.plies; i++) {
-                            this._eQ.clearQueue();
-                            this._eQ = this._lastEventQueue();
-                        }
-                    } else {
-                        throw "break loops' param too large";
-                    }
-                } else {
-                    console.log("runFunction runError");
-                    throw e;
-                }
-            } finally {
-                r();
-            }
+            //try {
+            await f();
+            // } catch (e) {
+            //     if (e.info && e.info === "BREAK_BY_AVG") {
+            //         if (e.plies <= this._loopPliesCount) {
+            //             this._loopPliesCount -= e.plies;
+            //             for (let i = 0; i < e.plies; i++) {
+            //                 this._eQ.clearQueue();
+            //                 this._eQ = this._lastEventQueue();
+            //             }
+            //         } else {
+            //             throw "break loops' param too large";
+            //         }
+            //     } else {
+            //         console.log("runFunction runError");
+            //         throw e;
+            //     }
+            // } finally {
+            r();
+            //}
         });
     }
     /**按队列执行一个函数，runFunction别名
@@ -169,9 +167,11 @@ class Avg {
                 () => {
                     this.runFunction(f);
                 },
-                r
+                () => {
+                    console.log("resolve");
+                    r();
+                }
             );
-            this.runFunction(f);
         });
     }
     /**按队列并循环一个函数，loopFunction别名
@@ -184,10 +184,16 @@ class Avg {
      * @param {number} plies 中断层数
      */
     breakLoopFunction(plies = 1) {
-        if (typeof plies !== "number") {
-            throw "can not break function by a wrong plies";
-        }
-        throw { plies: plies, info: "BREAK_BY_AVG" };
+        this._eQ.add(r => {
+            if (plies <= this._loopPliesCount) {
+                this._loopPliesCount -= e.plies;
+                for (let i = 0; i < plies; i++) {
+                    this._eQ.clearQueue();
+                    this._eQ = this._lastEventQueue;
+                }
+            }
+            r();
+        });
     }
     /**中断事件的执行，breakLoopFunction别名
      * @param {number} plies 中断层数
@@ -220,6 +226,7 @@ class Avg {
             this._eQArray = new Array();
         }
         this._eQPointer++;
+
         if (!this._eQArray[this._eQPointer]) {
             switch (type) {
                 case "eventQueue": {

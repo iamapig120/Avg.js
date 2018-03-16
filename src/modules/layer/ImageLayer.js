@@ -1,6 +1,6 @@
-import * as con from "../const/const";
-import { Layer } from "./Layer";
-import { isNum, switchInstanceof } from "../function/fun";
+import * as con from "../const/const.js";
+import { Layer } from "./Layer.js";
+import { isNum, switchInstanceof } from "../function/fun.js";
 
 /**图像图层类
  */

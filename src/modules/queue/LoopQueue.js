@@ -1,4 +1,4 @@
-import { EventQueue } from "./EventQueue";
+import { EventQueue } from "./EventQueue.js";
 
 /**循环队列
  */
@@ -22,11 +22,9 @@ class LoopQueue extends EventQueue {
         this._flag = true;
         (async function() {
             while (_this.hasNext()) {
-                await (function() {
-                    return new Promise(r => {
-                        _this._queue[0](r);
-                    });
-                })();
+                await new Promise(r => {
+                    _this._queue[0](r);
+                });
                 _this._queue.splice(0, 1);
             }
             _this._flag = false;
@@ -48,6 +46,9 @@ class LoopQueue extends EventQueue {
      */
     setResloveFunction(f) {
         this._resFun = f;
+        if (!this.hasNext()) {
+            this.next();
+        }
     }
     /**清空队列
      */

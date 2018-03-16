@@ -1,5 +1,5 @@
-import * as con from "../const/const";
-import { Layer } from "./Layer";
+import * as con from "../const/const.js";
+import { Layer } from "./Layer.js";
 
 /**文本图层类
  */
@@ -45,6 +45,14 @@ class TextLayer extends Layer {
         this._ctx = this.pixel.getContext("2d");
 
         this._ctx.textBaseline = "top";
+
+        /**
+         * @type {SVGSVGElement} SVG对象，用于排版文字
+         */
+        this._svg = document.createAttributeNS(
+            "http://www.w3.org/2000/svg",
+            "svg"
+        );
 
         this.setText(text);
         this.setFont(font);

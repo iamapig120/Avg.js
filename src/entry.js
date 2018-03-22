@@ -1,3 +1,3 @@
-import { Avg } from "./modules/avgmain/Avg.js";
+import { Avg } from './modules/avgmain/Avg.js'
 
-window.Avg = Avg;
+window.Avg = Avg

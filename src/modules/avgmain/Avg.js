@@ -107,7 +107,6 @@ class Avg {
             if (t < 0) t = 0;
             let goneTime;
             let raf = requestAnimationFrame(function waitCont() {
-                //console.log("inLoop");
                 goneTime = performance.now() - startTime;
                 if (goneTime >= t) {
                     r();
@@ -128,24 +127,7 @@ class Avg {
      */
     runFunction(f) {
         this._eQ.add(async r => {
-            //try {
             await f();
-            // } catch (e) {
-            //     if (e.info && e.info === "BREAK_BY_AVG") {
-            //         if (e.plies <= this._loopPliesCount) {
-            //             this._loopPliesCount -= e.plies;
-            //             for (let i = 0; i < e.plies; i++) {
-            //                 this._eQ.clearQueue();
-            //                 this._eQ = this._lastEventQueue();
-            //             }
-            //         } else {
-            //             throw "break loops' param too large";
-            //         }
-            //     } else {
-            //         console.log("runFunction runError");
-            //         throw e;
-            //     }
-            // } finally {
             r();
         });
     }
@@ -222,7 +204,6 @@ class Avg {
             this._eQArray = new Array();
         }
         this._eQPointer++;
-        console.log("next");
         if (!this._eQArray[this._eQPointer]) {
             switch (type) {
                 case "eventQueue": {
@@ -235,7 +216,6 @@ class Avg {
                 }
             }
         }
-        //this._eQArray[this._eQPointer].clearQueue();
         if (
             this._eQArray[this._eQPointer].__proto__.constructor === LoopQueue
         ) {
@@ -253,7 +233,6 @@ class Avg {
             throw "No Queque in Array!";
         }
         this._eQPointer--;
-        console.log("last");
         if (this._eQPointer < 0) {
             this._eQPointer = 0;
         }

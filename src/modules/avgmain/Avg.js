@@ -1,5 +1,3 @@
-import { switchInstanceof } from '../function/fun.js'
-
 import { EventQueue } from '../queue/EventQueue.js'
 import { LoopQueue } from '../queue/LoopQueue.js'
 
@@ -15,11 +13,14 @@ class Avg {
    * @param {number} [p.height = 720] canvas高度
    * @param {number} [p.width = 1280] canvas宽度
    */
-  constructor({
-    target = document.createElement('canvas'),
-    height = 720,
-    width = 1280
-  } = {}) {
+  constructor({ target = null, height = 720, width = 1280 } = {}) {
+    if (target === null) {
+      /**设置高度和宽度
+       */
+      target = document.createElement('canvas')
+      target.height = height
+      target.width = width
+    }
     /**主绘图板
      * @type {HTMLCanvasElement}
      */
@@ -78,7 +79,7 @@ class Avg {
    * @param {number} [p.width = 1280] canvas宽度
    */
   setSize({ width = 1280, height = 720 } = {}) {
-    ;[this.getCanvas(), this.getCanvas(true)].forEach(e => {
+    [this.getCanvas(), this.getCanvas(true)].forEach(e => {
       e.width = width
       e.height = height
     })
@@ -106,12 +107,12 @@ class Avg {
       t -= 13.34
       if (t < 0) t = 0
       let goneTime
-      let raf = requestAnimationFrame(function waitCont() {
+      requestAnimationFrame(function waitCont() {
         goneTime = performance.now() - startTime
         if (goneTime >= t) {
           r()
         } else {
-          raf = requestAnimationFrame(waitCont)
+          requestAnimationFrame(waitCont)
         }
       })
     })

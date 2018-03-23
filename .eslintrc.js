@@ -1,14 +1,6 @@
 module.exports = {
-  extends: 'eslint:recommended',
-  parserOptions: {
-    ecmaVersion: 2018,
-    sourceType: 'module'
-  },
+  extends: 'standard',
   env: {
-    browser: true,
-    es6: true
-  },
-  rules: {
-    'no-console': 'off'
+    browser: true
   }
 }

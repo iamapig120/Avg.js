@@ -1,10 +1,10 @@
 import * as con from '../const/const.js'
 import { Layer } from './Layer.js'
 
-/**文本图层类
+/** 文本图层类
  */
 class TextLayer extends Layer {
-  /**构造一个文本图层
+  /** 构造一个文本图层
    * @param {Object} p 传入的参数
    * @param {number} p.layer 图层号
    * @param {number} [p.x = 0] 绘制于X
@@ -21,7 +21,7 @@ class TextLayer extends Layer {
    * @param {string} [p.text = ""] 文本内容
    * @param {string} [p.font = DEFUALT_FONT] 字体设置
    */
-  constructor({
+  constructor ({
     layer,
     x = 0,
     y = 0,
@@ -54,20 +54,20 @@ class TextLayer extends Layer {
     this.setText(text)
     this.setFont(font)
   }
-  /**设置文本图层的字符串内容
+  /** 设置文本图层的字符串内容
    * @param {string} text 要设置为的字符串
    */
-  setText(text) {
+  setText (text) {
     if (text.toString) {
       return '' + text
     } else {
       return false
     }
   }
-  /**设置文本图层的字体
+  /** 设置文本图层的字体
    * @param {string} text 要设置为的字体
    */
-  setFont(font = this.font) {
+  setFont (font = this.font) {
     if (font.toString) {
       this.font = font.toString()
       this._drawText()
@@ -76,10 +76,10 @@ class TextLayer extends Layer {
       return false
     }
   }
-  /**重新绘制文本到canvas
+  /** 重新绘制文本到canvas
    * @param {string} text 要绘制的文本
    */
-  _drawText(text = this.text) {
+  _drawText (text = this.text) {
     const textArr = text.split('\n')
     let maxWidth = 0
     let temp

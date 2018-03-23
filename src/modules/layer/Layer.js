@@ -1,7 +1,7 @@
-/**图层类
+/** 图层类
  */
 class Layer {
-  /**构造一个图层
+  /** 构造一个图层
    * @param {Object} p 传入的参数
    * @param {number} p.layer 图层号
    * @param {number} [p.x = 0] 绘制于X
@@ -16,7 +16,7 @@ class Layer {
    * @param {number} [p.rotatePointy = 0] 旋转中心点Y
    * @param {"shade" | "mask" | false} [p.mask = false] 图层叠加顺序
    */
-  constructor({
+  constructor ({
     layer,
     x = 0,
     y = 0,
@@ -31,7 +31,7 @@ class Layer {
     mask = false
   } = {}) {
     if (typeof layer !== 'number') {
-      throw "params must have 'layer:<number>'"
+      throw new Error("params must have 'layer:<number>'")
     }
     /**
      * @type {number} 图层号
@@ -68,19 +68,19 @@ class Layer {
     /**
      * @type {number} 图层类型
      */
-    this.type
+    this.type = undefined
     /**
      * @type {HTMLImageElement | HTMLCanvasElement} 图层像素图
      */
-    this.pixel
+    this.pixel = undefined
     /**
      * @type {number} 图层宽度
      */
-    this.dWidth
+    this.dWidth = undefined
     /**
      * @type {number} 图层高度
      */
-    this.dHeight
+    this.dHeight = undefined
   }
 }
 

@@ -2,10 +2,10 @@ import * as con from '../const/const.js'
 import { Layer } from './Layer.js'
 import { isNum, switchInstanceof } from '../function/fun.js'
 
-/**图像图层类
+/** 图像图层类
  */
 class ImageLayer extends Layer {
-  /**构造一个图像图层类
+  /** 构造一个图像图层类
    * @param {Object} p 传入的参数
    * @param {number} p.layer 图层号
    * @param {string} [p.src] 图片地址
@@ -32,7 +32,7 @@ class ImageLayer extends Layer {
    * @param {number} [p.rotatePointy = 0] 旋转中心点Y
    * @param {"shade" | "mask" | false} [p.mask = false] 图层叠加顺序
    */
-  constructor({
+  constructor ({
     layer,
     sx = 0,
     sy = 0,

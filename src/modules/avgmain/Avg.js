@@ -1,6 +1,8 @@
 import { EventQueue } from '../queue/EventQueue.js'
 import { LoopQueue } from '../queue/LoopQueue.js'
 
+import * as con from '../const/const.js'
+
 import { ImageLayer } from '../layer/ImageLayer.js'
 import { TextLayer } from '../layer/TextLayer.js'
 
@@ -12,8 +14,14 @@ class Avg {
    * @param {HTMLCanvasElement} [p.target] 绘图板
    * @param {number} [p.height = 720] canvas高度
    * @param {number} [p.width = 1280] canvas宽度
+   * @param {string} [p.color = con.DEFUALT_COLOR] 文本颜色
    */
-  constructor ({ target = null, height = 720, width = 1280 } = {}) {
+  constructor ({
+    target = null,
+    height = 720,
+    width = 1280,
+    color = con.DEFUALT_COLOR
+  } = {}) {
     if (target === null) {
       /** 设置高度和宽度
        */
@@ -21,6 +29,10 @@ class Avg {
       target.height = height
       target.width = width
     }
+    /**
+     * 设置默认文本颜色
+     */
+    this.color = color
     /** 主绘图板
      * @type {HTMLCanvasElement}
      */

@@ -1,6 +1,20 @@
 import * as con from '../const/const.js'
 import { Layer } from './Layer.js'
 
+/**
+ * 预先定义用于测量文本高度的DOM元素
+ */
+const body = document.getElementsByTagName('body')[0]
+const tempDOM = document.createElement('div')
+tempDOM.style.padding = 0
+tempDOM.style.margin = 0
+tempDOM.style.border = 0
+tempDOM.style.boxSizing = 'border-box'
+tempDOM.style.width = 'max-content'
+
+// For Edge Firefox
+tempDOM.style.whiteSpace = 'nowrap'
+
 /** 文本图层类
  */
 class TextLayer extends Layer {
@@ -44,34 +58,42 @@ class TextLayer extends Layer {
     this.pixel = document.createElement('canvas')
     this._ctx = this.pixel.getContext('2d')
 
-    this._ctx.textBaseline = 'top'
-
     /**
      * @type {SVGSVGElement} SVG对象，用于排版文字
      */
     this._svg = document.createAttributeNS('http://www.w3.org/2000/svg', 'svg')
 
-    this.setText(text)
-    this.setFont(font)
+    this.setText(text, false)
+    this.setFont(font, false)
+
+    this._drawText()
   }
   /** 设置文本图层的字符串内容
    * @param {string} text 要设置为的字符串
+   * @param {boolean} reDraw 是否重绘
    */
-  setText (text) {
+  setText (text, reDraw = true) {
     if (text.toString) {
-      return '' + text
+      this.text = text.toString()
+      if (reDraw) {
+        this._drawText(this.text)
+      }
+      return this.text
     } else {
       return false
     }
   }
   /** 设置文本图层的字体
-   * @param {string} text 要设置为的字体
+   * @param {string} font 要设置为的字体
+   * @param {boolean} reDraw 是否重绘
    */
-  setFont (font = this.font) {
+  setFont (font, reDraw = true) {
     if (font.toString) {
       this.font = font.toString()
-      this._drawText()
-      return font.toString()
+      if (reDraw) {
+        this._drawText()
+      }
+      return this.font
     } else {
       return false
     }
@@ -82,15 +104,45 @@ class TextLayer extends Layer {
   _drawText (text = this.text) {
     const textArr = text.split('\n')
     let maxWidth = 0
+    let maxLineHeight = 0
     let temp
+
+    this._ctx.font = this.font
     textArr.forEach(t => {
-      temp = this._ctx.measureText(t).width
-      if (temp > maxWidth) {
-        maxWidth = Math.ceil(temp)
+      temp = this._ctx.measureText(t)
+      if (temp.width > maxWidth) {
+        maxWidth = Math.ceil(temp.width)
+      }
+      if (temp.emHeightAscent !== undefined) {
+        maxLineHeight = Math.ceil(temp.emHeightAscent + temp.emHeightDescent)
+      } else {
+        maxLineHeight = Math.ceil(TextLayer.testHeightByDOM(this.font))
       }
     })
     this.pixel.width = maxWidth
+    this.pixel.height = maxLineHeight * textArr.length
+
+    this._ctx.font = this.font
+    this._ctx.textBaseline = 'top'
+    for (let i = 0; i < textArr.length; i++) {
+      this._ctx.fillText(textArr[i], 0, i * maxLineHeight)
+    }
+
     this.dWidth = this.pixel.width
+    this.dHeight = this.pixel.height
+  }
+  /**
+   *
+   * @param {string} str 测试用字符串
+   * @param {*} font 使用的字体
+   */
+  static testHeightByDOM (font = con.DEFUALT_FONT, str = con.TEST_TEXT) {
+    tempDOM.innerText = str
+    tempDOM.style.font = font
+    body.appendChild(tempDOM)
+    const lineHeight = Math.ceil(tempDOM.offsetHeight)
+    body.removeChild(tempDOM)
+    return lineHeight
   }
 }
 

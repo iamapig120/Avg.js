@@ -1,15 +1,16 @@
 import { EventQueue } from '../queue/EventQueue.js'
 import { LoopQueue } from '../queue/LoopQueue.js'
 
+import { DrawingBoard } from '../drawingBoard/DrawingBoard.js'
+
 import * as con from '../const/const.js'
 
-import { ImageLayer } from '../layer/ImageLayer.js'
-import { TextLayer } from '../layer/TextLayer.js'
-
-/** Avg主类
+/**
+ * Avg主类
  */
 class Avg {
-  /** 构造一个对象
+  /**
+   * 构造一个对象
    * @param {Object} [p] 要传入的参数
    * @param {HTMLCanvasElement} [p.target] 绘图板
    * @param {number} [p.height = 720] canvas高度
@@ -17,75 +18,40 @@ class Avg {
    * @param {string} [p.color = con.DEFUALT_COLOR] 文本颜色
    */
   constructor ({
-    target = null,
-    height = 720,
-    width = 1280,
+    target = undefined,
+    width = con.DEFUALT_DRAWING_BOARD_WIDTH,
+    height = con.DEFUALT_DRAWING_BOARD_HEIGHT,
     color = con.DEFUALT_COLOR
   } = {}) {
-    if (target === null) {
-      /** 设置高度和宽度
-       */
-      target = document.createElement('canvas')
-      target.height = height
-      target.width = width
-    }
     /**
      * 设置默认文本颜色
+     * @type {string}
      */
     this.color = color
-    /** 主绘图板
-     * @type {HTMLCanvasElement}
-     */
-    this._canvasMain = undefined
-    Object.defineProperty(this, '_canvasMain', {
-      value: target,
-      writable: false
-    })
-    /** 遮罩层绘图板
-     * @type {HTMLCanvasElement}
-     */
-    this._canvasMask = undefined
-    Object.defineProperty(this, '_canvasMask', {
-      value: document.createElement('canvas'),
-      writable: false
-    })
-    /** 当前队列
+
+    /**
+     * 当前队列
      * @type {EventQueue | LoopQueue}
      */
     this._eQ = this._nextEventQueue()
 
-    /** 主绘图板画笔
-     * @type {CanvasRenderingContext2D}
-     */
-    this._paintBrush = undefined
-    Object.defineProperty(this, '_paintBrush', {
-      value: this.getBrush(),
-      writable: false
-    })
-
-    /** 遮罩层画笔
-     * @type {CanvasRenderingContext2D}
-     */
-    this._paintBrushForMask = undefined
-    Object.defineProperty(this, '_paintBrushForMask', {
-      value: this.getBrush(true),
-      writable: false
-    })
-
-    /** 图层记录
-     * @type {Array<Layer>}
-     */
-    this._layers = undefined
-    Object.defineProperty(this, '_layers', {
-      value: [],
-      writable: false
-    })
     /** 嵌套循环层数
      * @type {number}
      */
     this._loopPliesCount = 0
+
+    /**
+     * 绘图板
+     * @type {DrawingBoard}
+     */
+    this._drawingBoard = undefined
+    Object.defineProperty(this, '_drawingBoard', {
+      value: new DrawingBoard(arguments[0]),
+      writable: false
+    })
   }
-  /** 设置绘图板宽高
+  /**
+   * 设置绘图板宽高
    * @param {Object} [p] 要传入的参数
    * @param {number} [p.height = 720] canvas高度
    * @param {number} [p.width = 1280] canvas宽度
@@ -96,21 +62,24 @@ class Avg {
       e.height = height
     })
   }
-  /** 获取对象的绘图板
+  /**
+   * 获取对象的绘图板
    * @param {boolean} [mask = false] 是否要获取遮罩层绘图板
    * @returns {HTMLCanvasElement} 获取到的Canvas对象
    */
   getCanvas (mask = false) {
     return mask ? this._canvasMain : this._canvasMask
   }
-  /** 获取对象绘图板的2D画笔
+  /**
+   * 获取对象绘图板的2D画笔
    * @param {boolean} [mask = false] 是否要获取遮罩层绘图板画笔
    * @returns {CanvasRenderingContext2D} 获取到的画笔
    */
   getBrush (mask = false) {
     return (mask ? this._canvasMain : this._canvasMask).getContext('2d')
   }
-  /** 等待
+  /**
+   * 等待
    * @param {number} t 要等待的毫秒数
    */
   wait (t) {
@@ -119,23 +88,29 @@ class Avg {
       t -= 13.34
       if (t < 0) t = 0
       let goneTime
-      requestAnimationFrame(function waitCont () {
+      let req = requestAnimationFrame(function waitCont () {
         goneTime = performance.now() - startTime
         if (goneTime >= t) {
           r()
         } else {
-          requestAnimationFrame(waitCont)
+          req = requestAnimationFrame(waitCont)
         }
       })
+      setTimeout(() => {
+        cancelAnimationFrame(req)
+        r()
+      }, t)
     })
   }
-  /** 等待，wait别名
+  /**
+   * 等待，wait别名
    * @param {number} t 要等待的毫秒数
    */
   sleep (t) {
     this.wait(t)
   }
-  /** 按队列执行一个函数
+  /**
+   * 按队列执行一个函数
    * @param {function} f 要执行的函数
    */
   runFunction (f) {
@@ -144,13 +119,15 @@ class Avg {
       r()
     })
   }
-  /** 按队列执行一个函数，runFunction别名
+  /**
+   * 按队列执行一个函数，runFunction别名
    * @param {function} f 要执行的函数
    */
   run (f) {
     this.runFunction(f)
   }
-  /** 按队列并循环一个函数
+  /**
+   * 按队列并循环一个函数
    * @param {function} f 要循环执行的函数
    */
   loopFunction (f) {
@@ -165,13 +142,15 @@ class Avg {
       )
     })
   }
-  /** 按队列并循环一个函数，loopFunction别名
+  /**
+   * 按队列并循环一个函数，loopFunction别名
    * @param {function} f 要循环执行的函数
    */
   loop (f) {
     this.loopFunction(f)
   }
-  /** 中断事件的执行
+  /**
+   * 中断事件的执行
    * @param {number} plies 中断层数
    */
   breakLoopFunction (plies = 1) {
@@ -186,13 +165,15 @@ class Avg {
       r()
     })
   }
-  /** 中断事件的执行，breakLoopFunction别名
+  /**
+   * 中断事件的执行，breakLoopFunction别名
    * @param {number} plies 中断层数
    */
   break (plies = 1) {
     this.breakLoopFunction(plies)
   }
-  /** 从事件队列中请求下一个队列
+  /**
+   * 从事件队列中请求下一个队列
    * @param {"eventQueue" | "loopQueue"} [type = "eventQueue"]  请求的队列类型
    * @param {function} [finishFun] 如果是一个循环队列，要循环执行的Function
    * @param {function} [resolveFunction] 如果是一个循环队列，resolve函数
@@ -236,7 +217,8 @@ class Avg {
     }
     return this._eQArray[this._eQPointer]
   }
-  /** 从事件队列中请求上一个队列
+  /**
+   * 从事件队列中请求上一个队列
    * @returns {EventQueue | LoopQueue} 返回的队列
    */
   _lastEventQueue () {

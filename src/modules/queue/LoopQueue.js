@@ -1,9 +1,11 @@
 import { EventQueue } from './EventQueue.js'
 
-/** 循环队列
+/**
+ * 循环队列
  */
 class LoopQueue extends EventQueue {
-  /** 构造一个循环队列
+  /**
+   * 构造一个循环队列
    * @param {function} finishFun 要循环执行的事件
    * @param {function} resolveFunction 中断循环时的reslove方法
    */
@@ -16,7 +18,8 @@ class LoopQueue extends EventQueue {
     this._resFun = resolveFunction
     this._flag = false
   }
-  /** 执行下一个事件
+  /**
+   * 执行下一个事件
    */
   nextSync () {
     const _this = this
@@ -41,13 +44,15 @@ class LoopQueue extends EventQueue {
       throw new Error('LoopFunction Param is not a function!')
     }
   }
-  /** 设置中断循环后的reslove函数
+  /**
+   * 设置中断循环后的reslove函数
    * @param {function} f reslove函数
    */
   setResolveFunction (f) {
     this._resFun = f
   }
-  /** 清空队列
+  /**
+   * 清空队列
    */
   clearQueue () {
     /**

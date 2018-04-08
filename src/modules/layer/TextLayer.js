@@ -59,9 +59,16 @@ class TextLayer extends Layer {
     this._ctx = this.pixel.getContext('2d')
 
     /**
+     * 行高
+     */
+    this._lineHeight = 0
+
+    /**
      * @type {SVGSVGElement} SVG对象，用于排版文字
      */
     this._svg = document.createAttributeNS('http://www.w3.org/2000/svg', 'svg')
+
+    this._fontChanged = true
 
     this.setText(text, false)
     this.setFont(font, false)
@@ -89,6 +96,7 @@ class TextLayer extends Layer {
    */
   setFont (font, reDraw = true) {
     if (font.toString) {
+      this._fontChanged = !(this.font === font.toString())
       this.font = font.toString()
       if (reDraw) {
         this._drawText()
@@ -104,35 +112,40 @@ class TextLayer extends Layer {
   _drawText (text = this.text) {
     const textArr = text.split('\n')
     let maxWidth = 0
-    let maxLineHeight = 0
     let temp
 
     this._ctx.font = this.font
-    textArr.forEach(t => {
-      temp = this._ctx.measureText(t)
+    textArr.forEach(textEachline => {
+      temp = this._ctx.measureText(textEachline)
       if (temp.width > maxWidth) {
         maxWidth = Math.ceil(temp.width)
       }
-      if (temp.emHeightAscent !== undefined) {
-        maxLineHeight = Math.ceil(temp.emHeightAscent + temp.emHeightDescent)
-      } else {
-        maxLineHeight = Math.ceil(TextLayer.testHeightByDOM(this.font))
+      // 仅当字体有变化或更改时才重新设置行高
+      if (this._fontChanged) {
+        this._fontChanged = false
+        if (temp.emHeightAscent !== undefined) {
+          this._lineHeight = Math.ceil(
+            temp.emHeightAscent + temp.emHeightDescent
+          )
+        } else {
+          this._lineHeight = Math.ceil(TextLayer.testHeightByDOM(this.font))
+        }
       }
     })
     this.pixel.width = maxWidth
-    this.pixel.height = maxLineHeight * textArr.length
+    this.pixel.height = this._lineHeight * textArr.length
 
     this._ctx.font = this.font
     this._ctx.textBaseline = 'top'
     for (let i = 0; i < textArr.length; i++) {
-      this._ctx.fillText(textArr[i], 0, i * maxLineHeight)
+      this._ctx.fillText(textArr[i], 0, i * this._lineHeight)
     }
 
     this.dWidth = this.pixel.width
     this.dHeight = this.pixel.height
   }
   /**
-   *
+   * 通过构建一个DOM测试文本高度
    * @param {string} str 测试用字符串
    * @param {*} font 使用的字体
    */

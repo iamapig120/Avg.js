@@ -70,6 +70,61 @@ class DrawingBoard {
       value: [],
       writable: false
     })
+
+    /**
+     * 为首次绘图进行准备
+     */
+    this._paintBrush.globalCompositeOperation = 'destination-over'
+    this._paintBrushActive = undefined
+    this._paintBrushBackp = undefined
+  }
+
+  /**
+   * 重新绘图
+   */
+  reDraw () {
+    this._paintBrush.globalCompositeOperation = 'destination-over'
+    // TODO
+  }
+
+  /**
+   * 载入图像图层
+   * @param {object} p 参数
+   * @param {number} p.layer 图层号码
+   */
+  loadImage ({layer = undefined} = {}) {
+    if (layer === undefined) {
+      throw new Error('ImageLayer No. Undefined')
+    }
+    this._layers[layer] = new ImageLayer(...arguments)
+  }
+
+  /**
+   * 载入文本图层
+   * @param {object} p 参数
+   * @param {number} p.layer 图层号码
+   */
+  loadText ({layer = undefined} = {}) {
+    if (layer === undefined) {
+      throw new Error('TextLayer No. Undefined')
+    }
+    this._layers[layer] = new TextLayer(...arguments)
+  }
+
+  /**
+   * 移除一个图层
+   * @param {object} p 参数
+   * @param {number} p.layer 图层号码
+   * @param {Function} p.fun 移除后要执行的事件
+   */
+  removeLayer ({layer = undefined, fun = () => {}} = {}) {
+    if (layer === undefined) {
+      throw new Error('RemoveLayer No. Not Found')
+    }
+    const removed = this._layers[layer]
+    this._layers[layer] = undefined
+    fun(removed)
+    return removed
   }
 }
 

@@ -15,4 +15,10 @@ const switchInstanceof = (obj, switchs) => {
  */
 const isNum = test => typeof test === 'number'
 
-export { switchInstanceof, isNum }
+/** 输出具有 Avg.js 标识的 console
+ * @param {any} str 要测试的对象
+ */
+const consoleAvg = str =>
+  console.log('%c Avg.Js ', 'background:#333;color:#fff', str)
+
+export { switchInstanceof, isNum, consoleAvg }

@@ -5,10 +5,10 @@ import { TextLayer } from '../layer/TextLayer.js'
 
 class DrawingBoard {
   constructor ({
-    target = null,
+    target,
     width = con.DEFUALT_DRAWING_BOARD_WIDTH,
     height = con.DEFUALT_DRAWING_BOARD_HEIGHT
-  }) {
+  } = {}) {
     if (target === undefined) {
       /**
        * 设置高度和宽度
@@ -34,8 +34,8 @@ class DrawingBoard {
      */
     this._canvasMask = undefined
     const _canvasMask = document.createElement('canvas')
-    _canvasMask.width = this.target.width
-    _canvasMask.height = this.target.height
+    _canvasMask.width = target.width
+    _canvasMask.height = target.height
     Object.defineProperty(this, '_canvasMask', {
       value: _canvasMask,
       writable: false
@@ -92,7 +92,7 @@ class DrawingBoard {
    * @param {object} p 参数
    * @param {number} p.layer 图层号码
    */
-  loadImage ({layer = undefined} = {}) {
+  loadImage ({ layer = undefined } = {}) {
     if (layer === undefined) {
       throw new Error('ImageLayer No. Undefined')
     }
@@ -104,7 +104,7 @@ class DrawingBoard {
    * @param {object} p 参数
    * @param {number} p.layer 图层号码
    */
-  loadText ({layer = undefined} = {}) {
+  loadText ({ layer = undefined } = {}) {
     if (layer === undefined) {
       throw new Error('TextLayer No. Undefined')
     }
@@ -117,7 +117,7 @@ class DrawingBoard {
    * @param {number} p.layer 图层号码
    * @param {Function} p.fun 移除后要执行的事件
    */
-  removeLayer ({layer = undefined, fun = () => {}} = {}) {
+  removeLayer ({ layer = undefined, fun = () => {} } = {}) {
     if (layer === undefined) {
       throw new Error('RemoveLayer No. Not Found')
     }
@@ -125,6 +125,25 @@ class DrawingBoard {
     this._layers[layer] = undefined
     fun(removed)
     return removed
+  }
+
+  /**
+   * 获取对象的绘图板
+   * @param {boolean} [mask = false] 是否要获取遮罩层绘图板
+   * @returns {HTMLCanvasElement} 获取到的Canvas对象
+   */
+  getCanvas (mask = false) {
+    return mask ? this._canvasMain : this._canvasMask
+  }
+  /**
+   * 获取对象绘图板的2D画笔
+   * @param {boolean} [mask = false] 是否要获取遮罩层绘图板画笔
+   * @returns {CanvasRenderingContext2D} 获取到的画笔
+   */
+  getBrush (mask = false) {
+    return mask
+      ? this._canvasMain.getContext('2d')
+      : this._canvasMask.getContext('2d')
   }
 }
 

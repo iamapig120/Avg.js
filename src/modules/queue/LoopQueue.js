@@ -6,15 +6,15 @@ import { EventQueue } from './EventQueue.js'
 class LoopQueue extends EventQueue {
   /**
    * 构造一个循环队列
-   * @param {function} finishFun 要循环执行的事件
+   * @param {function} functionToLoop 要循环执行的事件
    * @param {function} resolveFunction 中断循环时的reslove方法
    */
   constructor (
-    finishFun = () => {},
+    functionToLoop = () => {},
     resolveFunction = () => new Promise(resolve => resolve())
   ) {
     super()
-    this._loopFun = finishFun
+    this._loopFun = functionToLoop
     this._resFun = resolveFunction
     this._flag = false
   }

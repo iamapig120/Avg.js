@@ -123,10 +123,12 @@ class TextLayer extends Layer {
       // 仅当字体有变化或更改时才重新设置行高
       if (this._fontChanged) {
         this._fontChanged = false
+        // 当存在符合标准的 emHeightAscent 属性时，使用该属性
         if (temp.emHeightAscent !== undefined) {
           this._lineHeight = Math.ceil(
             temp.emHeightAscent + temp.emHeightDescent
           )
+          // 否则使用通过DOM测量的结果
         } else {
           this._lineHeight = Math.ceil(TextLayer.testHeightByDOM(this.font))
         }

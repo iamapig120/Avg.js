@@ -16,6 +16,17 @@ module.exports = {
           }
         },
         exclude: /node_modules/
+      },
+      {
+        // test: /(\.js)$/,
+        test: /entry.js/,
+        use: {
+          loader: './src/loader/packTime.js',
+          options: {
+            presets: ['env']
+          }
+        },
+        exclude: /node_modules/
       }
     ]
   }

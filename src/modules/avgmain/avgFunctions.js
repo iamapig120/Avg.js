@@ -21,17 +21,17 @@ const avgFunctions = {
      * @param {boolean} [mask = false] 是否要获取遮罩层绘图板
      * @returns {HTMLCanvasElement} 获取到的Canvas对象
      */
-  // getCanvas: function (mask = false) {
-  //   return this._drawingBoard.getCanvas(mask)
-  // },
+  getCanvas: function (mask = false) {
+    return this._drawingBoard.getCanvas(mask)
+  },
   /**
      * 获取对象绘图板的2D画笔
      * @param {boolean} [mask = false] 是否要获取遮罩层绘图板画笔
      * @returns {CanvasRenderingContext2D} 获取到的画笔
      */
-  // getBrush: function (mask = false) {
-  //   return this._drawingBoard.getBrush(mask)
-  // },
+  getBrush: function (mask = false) {
+    return this._drawingBoard.getBrush(mask)
+  },
   /**
      * 等待
      * @param {number} t 要等待的毫秒数

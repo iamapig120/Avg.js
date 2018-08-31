@@ -5,8 +5,8 @@
  */
 const avgPrototypeKV = {
   setSize: ['setSize'],
-  // getCanvas: ['getCanvas'],
-  // getBrush: ['getBrush'],
+  getCanvas: ['getCanvas'],
+  getBrush: ['getBrush'],
   wait: ['wait', 'sleep'],
   runFunction: ['runFunction', 'run'],
   loopFunction: ['loopFunction', 'loop'],

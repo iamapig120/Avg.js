@@ -1,5 +1,10 @@
 import * as con from '../const/const.js'
 
+/**
+ * Avg主类的部分方法，
+ * 单独使用 avgFunctions 对象进行设置，
+ * 减少面条代码出现
+ */
 const avgFunctions = {
   /**
      * 设置绘图板宽高

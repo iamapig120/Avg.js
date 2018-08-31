@@ -15,7 +15,9 @@ tempDOM.style.width = 'max-content'
 // For Edge Firefox
 tempDOM.style.whiteSpace = 'nowrap'
 
-/** 文本图层类
+/**
+ * 文本图层类，
+ * 包含有实际1个实际的canvas
  */
 class TextLayer extends Layer {
   /** 构造一个文本图层

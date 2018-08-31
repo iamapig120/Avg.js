@@ -1,4 +1,8 @@
-// Avg类的方法注册，K为avgFunctions中的属性名，v为一个数组，为Avg类的对应方法名
+/**
+ * Avg类的方法注册，
+ * Key 为avgFunctions中的属性名，
+ * Value 为一个数组，为Avg类的对应方法名
+ */
 const avgPrototypeKV = {
   setSize: ['setSize'],
   // getCanvas: ['getCanvas'],

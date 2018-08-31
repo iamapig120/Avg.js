@@ -3,6 +3,11 @@ import * as con from '../const/const.js'
 import { ImageLayer } from '../layer/ImageLayer.js'
 import { TextLayer } from '../layer/TextLayer.js'
 
+/**
+ * 绘图板类，
+ * 一个程序中通常只需要一个，
+ * 包含有两个实际的canvas绘图板
+ */
 class DrawingBoard {
   constructor ({
     target,

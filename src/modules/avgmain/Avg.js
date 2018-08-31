@@ -27,7 +27,7 @@ class Avg {
     color = con.DEFUALT_COLOR // 默认文本颜色
   } = {}) {
     /**
-     * 设置默认文本颜色
+     * 默认文本颜色
      * @type {string}
      */
     this.color = color

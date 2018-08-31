@@ -3,7 +3,8 @@ module.exports = {
   entry: './src/entry.js',
   output: {
     path: __dirname,
-    filename: 'avg.min.js'
+    filename: 'avg.min.js',
+    libraryTarget: 'umd'
   },
   module: {
     rules: [

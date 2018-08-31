@@ -22,8 +22,8 @@ class Avg {
    */
   constructor ({
     target = undefined, // 绘图板参数，目标canvas
-    width = con.DEFUALT_DRAWING_BOARD_WIDTH, // 绘图板参数，绘图板宽度
-    height = con.DEFUALT_DRAWING_BOARD_HEIGHT, // 绘图板参数，绘图板高度
+    width = con.DEFAULT_DRAWING_BOARD_WIDTH, // 绘图板参数，绘图板宽度
+    height = con.DEFAULT_DRAWING_BOARD_HEIGHT, // 绘图板参数，绘图板高度
     color = con.DEFUALT_COLOR // 默认文本颜色
   } = {}) {
     /**

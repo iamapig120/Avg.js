@@ -13,8 +13,8 @@ const avgFunctions = {
      * @param {number} [p.width = con.DEFUALT_DRAWING_BOARD_WIDTH] canvas宽度
      */
   setSize: function ({
-    width = con.DEFUALT_DRAWING_BOARD_WIDTH,
-    height = con.DEFUALT_DRAWING_BOARD_HEIGHT
+    width = con.DEFAULT_DRAWING_BOARD_WIDTH,
+    height = con.DEFAULT_DRAWING_BOARD_HEIGHT
   } = {}) {
     ;[this.getCanvas(), this.getCanvas(true)].forEach(e => {
       e.width = width

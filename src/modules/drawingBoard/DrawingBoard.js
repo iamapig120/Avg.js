@@ -11,8 +11,8 @@ import { TextLayer } from '../layer/TextLayer.js'
 class DrawingBoard {
   constructor ({
     target,
-    width = con.DEFUALT_DRAWING_BOARD_WIDTH,
-    height = con.DEFUALT_DRAWING_BOARD_HEIGHT
+    width = con.DEFAULT_DRAWING_BOARD_WIDTH,
+    height = con.DEFAULT_DRAWING_BOARD_HEIGHT
   } = {}) {
     if (target === undefined) {
       /**

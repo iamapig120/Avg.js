@@ -51,7 +51,7 @@ class TextLayer extends Layer {
     rotatePointy = rotatePointY,
     mask = false,
     text = '',
-    font = con.DEFUALT_FONT
+    font = con.DEFAULT_FONT
   } = {}) {
     super(arguments[0])
 
@@ -153,7 +153,7 @@ class TextLayer extends Layer {
    * @param {string} str 测试用字符串
    * @param {*} font 使用的字体
    */
-  static testHeightByDOM (font = con.DEFUALT_FONT, str = con.TEST_TEXT) {
+  static testHeightByDOM (font = con.DEFAULT_FONT, str = con.TEST_TEXT) {
     tempDOM.innerText = str
     tempDOM.style.font = font
     body.appendChild(tempDOM)
